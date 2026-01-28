@@ -101,61 +101,60 @@ Config.Interiors = {
     ["ModernApartment"] = {
         label = "Moderne Wohnung",
         type = "apartment",
-        shell = "ModernHotel", -- QB-Interior Shell-Name (KEIN fest integrierter Marker)
-        spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Anpassen basierend auf tatsächlichem Shell-Spawn
+        shell = "ModernHotel", -- QB-Interior Shell-Name
+        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
     },
     ["ClassicApartment"] = {
         label = "Klassische Wohnung",
         type = "apartment",
-        shell = "DelPerroHeights", -- QB-Interior Shell-Name (KEIN fest integrierter Marker)
-        spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Anpassen basierend auf tatsächlichem Shell-Spawn
+        shell = "DelPerroHeights", -- QB-Interior Shell-Name
+        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
     },
     ["LuxuryApartment"] = {
         label = "Luxus-Wohnung",
         type = "apartment",
         shell = "EclipseTowers", -- QB-Interior Shell-Name
-        spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Anpassen basierend auf tatsächlichem Shell-Spawn
+        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
     },
     
     -- Häuser
     ["StandardHouse"] = {
         label = "Standard-Haus",
         type = "house",
-        shell = "FranklinHouse", -- QB-Interior Shell-Name (KEIN fest integrierter Marker)
-        spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Anpassen basierend auf tatsächlichem Shell-Spawn
+        shell = "FranklinHouse", -- QB-Interior Shell-Name
+        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
     },
     ["ModernHouse"] = {
         label = "Modernes Haus",
         type = "house",
-        shell = "MichaelHouse", -- QB-Interior Shell-Name (KEIN fest integrierter Marker)
-        spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Anpassen basierend auf tatsächlichem Shell-Spawn
+        shell = "MichaelHouse", -- QB-Interior Shell-Name
+        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
     },
     ["LuxuryHouse"] = {
         label = "Luxus-Haus",
         type = "house",
         shell = "TrevorHouse", -- QB-Interior Shell-Name
-        spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Anpassen basierend auf tatsächlichem Shell-Spawn
+        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
     },
     
     -- Büros
     ["SmallOffice"] = {
         label = "Kleines Büro",
         type = "office",
-        shell = "OfficeLow", -- QB-Interior Shell-Name (WARNUNG: Hat möglicherweise integrierten grünen Marker!)
-        spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- Anpassen basierend auf tatsächlichem Shell-Spawn
-        -- ALTERNATIVE: Ändern Sie shell zu einem anderen Büro-Shell ohne integrierten Marker
+        shell = "OfficeLow", -- QB-Interior Shell-Name
+        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
     },
     ["MediumOffice"] = {
         label = "Mittleres Büro",
         type = "office",
         shell = "OfficeMid", -- QB-Interior Shell-Name
-        spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- Anpassen basierend auf tatsächlichem Shell-Spawn
+        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
     },
     ["LargeOffice"] = {
         label = "Großes Büro",
         type = "office",
         shell = "OfficeHigh", -- QB-Interior Shell-Name
-        spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- Anpassen basierend auf tatsächlichem Shell-Spawn
+        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
     }
 }
 
