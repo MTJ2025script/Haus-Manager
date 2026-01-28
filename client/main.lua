@@ -403,6 +403,10 @@ function EnterProperty(property)
     -- CRITICAL: Store exterior coords and heading for exit
     currentProperty.storedExteriorCoords = vector4(exteriorCoords.x, exteriorCoords.y, exteriorCoords.z, exteriorHeading)
     
+    -- CRITICAL FIX: Trigger safe and wardrobe marker creation
+    print("^2[Haus-Manager EnterProperty]^7 Setting up interior markers (safe, wardrobe)")
+    TriggerEvent('haus-manager:client:setupInteriorMarkers', property)
+    
     Framework.Notify(Config.Notifications["entered_property"] or "Property betreten", 'success')
     print("^2[Haus-Manager EnterProperty]^7 Property entered successfully - player is now inside")
 end
@@ -412,6 +416,10 @@ function ExitProperty()
     if not isInProperty or not currentProperty then return end
     
     print("^2[Haus-Manager ExitProperty]^7 Exiting property: " .. tostring(currentProperty.property_name))
+    
+    -- CRITICAL: Clean up safe and wardrobe markers BEFORE exit
+    print("^2[Haus-Manager ExitProperty]^7 Cleaning up interior markers")
+    TriggerEvent('haus-manager:client:cleanupInteriorMarkers', currentProperty.property_id)
     
     DoScreenFadeOut(500)
     Wait(500)
