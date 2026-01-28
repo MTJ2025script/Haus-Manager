@@ -408,7 +408,7 @@ function EnterProperty(property)
     
     -- CRITICAL FIX: Create exit marker at spawn location
     print("^2[Haus-Manager EnterProperty]^7 Erstelle Ausgangs-Marker im Interior")
-    CreateInteriorExitMarker(spawnCoords)
+    CreateInteriorExitMarker(interiorConfig.spawn)
     
     Framework.Notify(Config.Notifications["entered_property"] or "Immobilie betreten", 'success')
     print("^2[Haus-Manager EnterProperty]^7 Immobilie erfolgreich betreten - Spieler ist jetzt drinnen")
