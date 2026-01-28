@@ -42,20 +42,19 @@ function EnterInterior(property)
     -- We offset the coordinates to create unique instances
     local propertyOffset = property.property_id and tonumber(string.match(property.property_id, "%d+")) or 0
     
-    -- Interior spawn coordinates (proper interior positions based on type)
-    -- Using researched coordinates that spawn player inside with proper door access
+    -- Get spawn coordinates from config (with small offset for unique instances)
     local interiorSpawn
-    if interiorConfig.type == "apartment" then
-        -- Apartment interior with proper spawn point near door
-        interiorSpawn = vector4(-782.4077 + (propertyOffset * 0.01), 318.4500, 217.6737, 355.4485)
-    elseif interiorConfig.type == "house" then
-        -- House interior spawn point
-        interiorSpawn = vector4(-174.35 + (propertyOffset * 0.01), 497.5, 137.65, 180.0)
-    elseif interiorConfig.type == "office" then
-        -- Office interior spawn point
-        interiorSpawn = vector4(-141.0 + (propertyOffset * 0.01), -620.0, 168.82, 90.0)
+    if interiorConfig.spawn then
+        -- Use configured spawn coordinates with small offset
+        interiorSpawn = vector4(
+            interiorConfig.spawn.x + (propertyOffset * 0.01),
+            interiorConfig.spawn.y,
+            interiorConfig.spawn.z,
+            interiorConfig.spawn.w or 0.0
+        )
     else
-        -- Default to apartment coordinates
+        -- Fallback to default apartment coordinates if not configured
+        print("^1[Haus-Manager Interior]^7 WARNING: No spawn configured for interior type: " .. tostring(interiorType))
         interiorSpawn = vector4(-782.4077, 318.4500, 217.6737, 355.4485)
     end
     
@@ -194,16 +193,6 @@ function DrawText3D(x, y, z, text)
     ClearDrawOrigin()
 end
 
--- Override EnterProperty from main.lua
-function EnterProperty(property)
-    EnterInterior(property)
-end
-
--- Override ExitProperty from main.lua
-function ExitProperty()
-    ExitInterior()
-end
-
 -- Exit property event (triggered when property is sold)
 RegisterNetEvent('haus-manager:client:exitProperty', function()
     if insideProperty or currentInterior then
@@ -252,7 +241,7 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     end
 end)
 
--- Export functions
+-- Export functions for other scripts to use if needed
 exports('EnterInterior', EnterInterior)
 exports('ExitInterior', ExitInterior)
 exports('IsInsideProperty', function() return insideProperty end)
