@@ -185,8 +185,9 @@ function Target.StartDrawTextMode()
                         elseif option.icon == 'fas fa-home' then icon = '🏠'
                         end
                         
-                        DrawText3D(nearestZone.zone.coords.x, nearestZone.zone.coords.y, nearestZone.zone.coords.z + 1.0, 
-                            icon .. ' [~g~E~w~] ' .. option.label)
+                        -- ONLY show [E] prompt, NOT property name (property name shown by markers.lua)
+                        DrawText3D(nearestZone.zone.coords.x, nearestZone.zone.coords.y, nearestZone.zone.coords.z + 1.2, 
+                            icon .. ' [~g~E~w~] Interagieren')
                     end
                 end
                 
