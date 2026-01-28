@@ -97,64 +97,82 @@ Config.RentPeriods = {
 --   - Büros: "OfficeStandard" (falls verfügbar statt "OfficeLow")
 --
 Config.Interiors = {
-    -- Apartments
+    -- Apartments (ESX-kompatible Koordinaten)
     ["ModernApartment"] = {
         label = "Moderne Wohnung",
         type = "apartment",
-        shell = "ModernHotel", -- QB-Interior Shell-Name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
+        shell = "ModernHotel",
+        spawn = vector4(266.06, -1007.43, -101.01, 0.0), -- Funktionierendes Apartment Interior
+        safe_coords = vector4(260.0, -1003.0, -99.0, 90.0),
+        wardrobe_coords = vector4(263.0, -1000.5, -99.0, 180.0)
     },
     ["ClassicApartment"] = {
         label = "Klassische Wohnung",
         type = "apartment",
-        shell = "DelPerroHeights", -- QB-Interior Shell-Name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
+        shell = "DelPerroHeights",
+        spawn = vector4(265.0, -1007.0, -101.0, 0.0),
+        safe_coords = vector4(259.0, -1003.0, -99.0, 90.0),
+        wardrobe_coords = vector4(262.0, -1000.0, -99.0, 180.0)
     },
     ["LuxuryApartment"] = {
         label = "Luxus-Wohnung",
         type = "apartment",
-        shell = "EclipseTowers", -- QB-Interior Shell-Name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
+        shell = "EclipseTowers",
+        spawn = vector4(267.0, -1008.0, -101.0, 0.0),
+        safe_coords = vector4(261.0, -1004.0, -99.0, 90.0),
+        wardrobe_coords = vector4(264.0, -1001.0, -99.0, 180.0)
     },
     
-    -- Häuser
+    -- Häuser (ESX-kompatible Koordinaten)
     ["StandardHouse"] = {
         label = "Standard-Haus",
         type = "house",
-        shell = "FranklinHouse", -- QB-Interior Shell-Name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
+        shell = "FranklinHouse",
+        spawn = vector4(-174.35, 497.5, 137.65, 180.0), -- Franklin Area Interior
+        safe_coords = vector4(-169.0, 493.0, 137.65, 270.0),
+        wardrobe_coords = vector4(-171.0, 496.0, 137.65, 0.0)
     },
     ["ModernHouse"] = {
         label = "Modernes Haus",
         type = "house",
-        shell = "MichaelHouse", -- QB-Interior Shell-Name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
+        shell = "MichaelHouse",
+        spawn = vector4(-175.0, 498.0, 137.5, 180.0),
+        safe_coords = vector4(-169.5, 493.5, 137.5, 270.0),
+        wardrobe_coords = vector4(-171.5, 496.5, 137.5, 0.0)
     },
     ["LuxuryHouse"] = {
         label = "Luxus-Haus",
         type = "house",
-        shell = "TrevorHouse", -- QB-Interior Shell-Name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
+        shell = "TrevorHouse",
+        spawn = vector4(-173.0, 496.5, 137.8, 180.0),
+        safe_coords = vector4(-168.0, 492.5, 137.8, 270.0),
+        wardrobe_coords = vector4(-170.0, 495.5, 137.8, 0.0)
     },
     
-    -- Büros
+    -- Büros (ESX-kompatible Koordinaten)
     ["SmallOffice"] = {
         label = "Kleines Büro",
         type = "office",
-        shell = "OfficeLow", -- QB-Interior Shell-Name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
+        shell = "OfficeLow",
+        spawn = vector4(-1003.09, -478.02, 50.03, 90.0), -- Office Building Interior
+        safe_coords = vector4(-1007.5, -474.0, 50.03, 180.0),
+        wardrobe_coords = vector4(-1005.0, -476.5, 50.03, 270.0)
     },
     ["MediumOffice"] = {
         label = "Mittleres Büro",
         type = "office",
-        shell = "OfficeMid", -- QB-Interior Shell-Name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
+        shell = "OfficeMid",
+        spawn = vector4(-1002.5, -477.5, 50.0, 90.0),
+        safe_coords = vector4(-1007.0, -473.5, 50.0, 180.0),
+        wardrobe_coords = vector4(-1004.5, -476.0, 50.0, 270.0)
     },
     ["LargeOffice"] = {
         label = "Großes Büro",
         type = "office",
-        shell = "OfficeHigh", -- QB-Interior Shell-Name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- qb-interior Shell bestimmt die Position
+        shell = "OfficeHigh",
+        spawn = vector4(-1004.0, -479.0, 50.1, 90.0),
+        safe_coords = vector4(-1008.0, -475.0, 50.1, 180.0),
+        wardrobe_coords = vector4(-1005.5, -477.5, 50.1, 270.0)
     }
 }
 
