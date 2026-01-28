@@ -23,83 +23,67 @@ end)
 
 -- Initialize target system
 function Target.Initialize()
-    -- Check for qb-target (QB-Core)
-    if GetResourceState('qb-target') == 'started' then
-        local success = pcall(function()
-            -- Verify export exists
-            local test = exports['qb-target']
-            if test and test.AddBoxZone then
-                Target.Type = 'qb-target'
-                print("^2[Haus-Manager Target Bridge]^7 qb-target erkannt")
+    -- CRITICAL: Check Framework type FIRST to avoid conflicts
+    -- QB-Core: Use qb-target only
+    -- ESX: Use DrawText mode only (no ox_target/qtarget)
+    
+    local frameworkType = Framework and Framework.Type or nil
+    print("^2[Haus-Manager Target Bridge]^7 Framework detected: " .. tostring(frameworkType))
+    
+    -- QB-Core: Only check for qb-target
+    if frameworkType == 'qb-core' then
+        if GetResourceState('qb-target') == 'started' then
+            local success = pcall(function()
+                local test = exports['qb-target']
+                if test and test.AddBoxZone then
+                    Target.Type = 'qb-target'
+                    print("^2[Haus-Manager Target Bridge]^7 qb-target erkannt (QB-Core)")
+                end
+            end)
+            if success and Target.Type == 'qb-target' then
+                return
             end
-        end)
-        if success and Target.Type == 'qb-target' then
-            return
+        end
+        
+        print("^3[Haus-Manager Target Bridge]^7 QB-Core detected but qb-target not found, using DrawText fallback")
+    end
+    
+    -- ESX: ALWAYS use DrawText mode (ignore ox_target/qtarget to avoid double-target)
+    if frameworkType == 'esx' then
+        Target.Type = 'drawtext'
+        print("^2[Haus-Manager Target Bridge]^7 ESX detected - using DrawText/Prompt mode with icons")
+        return
+    end
+    
+    -- Fallback: Try to detect target systems if framework unknown
+    if not frameworkType then
+        print("^3[Haus-Manager Target Bridge]^7 Framework not detected yet, trying target detection...")
+        
+        -- Check for qb-target (QB-Core)
+        if GetResourceState('qb-target') == 'started' then
+            local success = pcall(function()
+                local test = exports['qb-target']
+                if test and test.AddBoxZone then
+                    Target.Type = 'qb-target'
+                    print("^2[Haus-Manager Target Bridge]^7 qb-target erkannt")
+                end
+            end)
+            if success and Target.Type == 'qb-target' then
+                return
+            end
         end
     end
     
-    -- Check for ox_target (Modern alternative)
-    if GetResourceState('ox_target') == 'started' then
-        local success = pcall(function()
-            local test = exports['ox_target']
-            if test and test.addBoxZone then
-                Target.Type = 'ox_target'
-                print("^2[Haus-Manager Target Bridge]^7 ox_target erkannt")
-            end
-        end)
-        if success and Target.Type == 'ox_target' then
-            return
-        end
-    end
-    
-    -- Check for qtarget (Alternative)
-    if GetResourceState('qtarget') == 'started' then
-        local success = pcall(function()
-            local test = exports['qtarget']
-            if test and test.AddBoxZone then
-                Target.Type = 'qtarget'
-                print("^2[Haus-Manager Target Bridge]^7 qtarget erkannt")
-            end
-        end)
-        if success and Target.Type == 'qtarget' then
-            return
-        end
-    end
-    
-    -- Fallback to DrawText/3D Text (ESX style)
+    -- Final fallback to DrawText/3D Text
     Target.Type = 'drawtext'
-    print("^2[Haus-Manager Target Bridge]^7 DrawText/3D-Text Modus (ESX)")
+    print("^2[Haus-Manager Target Bridge]^7 Using DrawText/Prompt mode")
 end
 
 -- Add box zone (for property markers)
 function Target.AddBoxZone(name, coords, length, width, options, targetOptions)
     if Target.Type == 'qb-target' then
         exports['qb-target']:AddBoxZone(name, coords, length, width, options, targetOptions)
-    elseif Target.Type == 'ox_target' then
-        -- ox_target uses different format - convert targetOptions
-        local oxOptions = {}
-        for i, option in ipairs(targetOptions) do
-            table.insert(oxOptions, {
-                name = name .. '_' .. i,
-                label = option.label,
-                icon = option.icon,
-                onSelect = option.action,  -- ox_target uses onSelect instead of action
-                canInteract = option.canInteract or function() return true end,
-                distance = length or 2.5
-            })
-        end
-        
-        exports['ox_target']:addBoxZone({
-            coords = coords,
-            size = vec3(length, width, options.minZ and (options.maxZ - options.minZ) or 2.0),
-            rotation = options.heading or 0.0,
-            debug = options.debugPoly or false,
-            options = oxOptions
-        })
-        
-        print("^2[Haus-Manager Target]^7 ox_target zone added: " .. name)
-    elseif Target.Type == 'qtarget' then
-        exports['qtarget']:AddBoxZone(name, coords, length, width, options, targetOptions)
+        print("^2[Haus-Manager Target]^7 qb-target zone added: " .. name)
     else
         -- DrawText mode - store zone info for proximity checks
         Target.ActiveZones[name] = {
@@ -109,8 +93,9 @@ function Target.AddBoxZone(name, coords, length, width, options, targetOptions)
             options = targetOptions,
             heading = options.heading or 0.0,
             minZ = options.minZ or (coords.z - 1.0),
-            maxZ = options.maxZ or (coords.z + 1.0)
+            maxZ = options.maxZ or (coords.z + 2.0)
         }
+        print("^2[Haus-Manager Target]^7 DrawText zone added: " .. name)
     end
 end
 
@@ -121,18 +106,12 @@ function Target.RemoveZone(name)
             exports['qb-target']:RemoveZone(name)
         end)
         if not success then
-            print("^3Warning: attempted to remove a zone that does not exist (id: " .. name .. ")^7")
+            print("^3[Haus-Manager Target]^7 Warning: attempted to remove qb-target zone that does not exist (id: " .. name .. ")")
         end
-    elseif Target.Type == 'ox_target' then
-        pcall(function()
-            exports['ox_target']:removeZone(name)
-        end)
-    elseif Target.Type == 'qtarget' then
-        pcall(function()
-            exports['qtarget']:RemoveZone(name)
-        end)
     else
+        -- DrawText mode - remove from active zones
         Target.ActiveZones[name] = nil
+        print("^2[Haus-Manager Target]^7 DrawText zone removed: " .. name)
     end
 end
 
@@ -145,7 +124,8 @@ function Target.StartDrawTextMode()
         local showingText = false
         local hasESXTextUI = GetResourceState('esx_textui') == 'started'
         
-        print("^2[Haus-Manager Target Bridge]^7 DrawText thread started, ESX TextUI: " .. tostring(hasESXTextUI))
+        print("^2[Haus-Manager Target Bridge]^7 DrawText/Prompt mode started")
+        print("^2[Haus-Manager Target Bridge]^7 ESX TextUI available: " .. tostring(hasESXTextUI))
         
         while true do
             local sleep = 500
@@ -157,7 +137,7 @@ function Target.StartDrawTextMode()
             -- Find nearest zone
             for name, zone in pairs(Target.ActiveZones) do
                 local dist = #(playerCoords - zone.coords)
-                local interactionDist = zone.length / 2 + 1.0 -- Approximation
+                local interactionDist = zone.length / 2 + 1.0
                 
                 if dist < interactionDist and dist < nearestDist then
                     nearestDist = dist
@@ -174,26 +154,39 @@ function Target.StartDrawTextMode()
                     showingText = false
                 end
                 
-                -- Show help text - try different methods
+                -- Show help text with icon
                 if not showingText and nearestZone.zone.options and #nearestZone.zone.options > 0 then
-                    local option = nearestZone.zone.options[1] -- Use first option
+                    local option = nearestZone.zone.options[1]
                     if option.label then
-                        -- Try esx_textui first
+                        -- Get icon from option or use default
+                        local icon = option.icon or 'fas fa-home'
+                        
+                        -- Try esx_textui first (with icon support)
                         if hasESXTextUI then
                             pcall(function()
-                                exports['esx_textui']:TextUI('[E] ' .. option.label)
+                                -- ESX TextUI with icon
+                                exports['esx_textui']:TextUI('[E] ' .. option.label, 'info')
                             end)
                         end
                         showingText = true
                     end
                 end
                 
-                -- Draw 3D text as fallback (always show)
+                -- Draw 3D text with icon as fallback (always show)
                 if showingText and nearestZone.zone.options and #nearestZone.zone.options > 0 then
                     local option = nearestZone.zone.options[1]
                     if option.label then
+                        -- Nice formatted 3D text with icon emoji
+                        local icon = option.icon or '🏠'
+                        if option.icon == 'fas fa-key' then icon = '🔑'
+                        elseif option.icon == 'fas fa-door-open' then icon = '🚪'
+                        elseif option.icon == 'fas fa-car' then icon = '🚗'
+                        elseif option.icon == 'fas fa-dollar-sign' then icon = '💰'
+                        elseif option.icon == 'fas fa-home' then icon = '🏠'
+                        end
+                        
                         DrawText3D(nearestZone.zone.coords.x, nearestZone.zone.coords.y, nearestZone.zone.coords.z + 1.0, 
-                            '[E] ' .. option.label)
+                            icon .. ' [~g~E~w~] ' .. option.label)
                     end
                 end
                 
@@ -203,7 +196,7 @@ function Target.StartDrawTextMode()
                     if nearestZone.zone.options and #nearestZone.zone.options > 0 then
                         for _, option in ipairs(nearestZone.zone.options) do
                             if option.action then
-                                print("^2[Haus-Manager Target]^7 Executing action for: " .. (option.label or "unknown"))
+                                print("^2[Haus-Manager Target]^7 Executing action: " .. (option.label or "unknown"))
                                 option.action()
                                 break
                             end
@@ -228,19 +221,21 @@ function Target.StartDrawTextMode()
     end)
 end
 
--- Helper function for 3D text (DrawText mode fallback)
+-- Helper function for 3D text (DrawText mode fallback) - Enhanced for ESX
 function DrawText3D(x, y, z, text)
-    SetTextScale(0.35, 0.35)
+    SetTextScale(0.40, 0.40)  -- Slightly larger for better visibility
     SetTextFont(4)
     SetTextProportional(1)
-    SetTextColour(255, 255, 255, 215)
+    SetTextColour(255, 255, 255, 235)  -- Brighter white
     SetTextEntry("STRING")
     SetTextCentre(true)
+    SetTextOutline()  -- Add outline for better readability
     AddTextComponentString(text)
-    SetDrawOrigin(x,y,z, 0)
+    SetDrawOrigin(x, y, z, 0)
     DrawText(0.0, 0.0)
-    local factor = (string.len(text)) / 370
-    DrawRect(0.0, 0.0+0.0125, 0.017+ factor, 0.03, 0, 0, 0, 75)
+    local factor = (string.len(text)) / 350
+    -- Slightly darker background with more transparency
+    DrawRect(0.0, 0.0+0.0125, 0.020+ factor, 0.035, 0, 0, 0, 90)
     ClearDrawOrigin()
 end
 
