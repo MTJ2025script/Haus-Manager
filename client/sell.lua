@@ -16,15 +16,36 @@ RegisterNetEvent('haus-manager:client:openSellMenu', function(data)
     
     print("^3[Haus-Manager Sell]^7 Property:", property.property_name)
     
-    -- Verify ownership
+    -- Verify ownership - ESX/QB-Core compatible
     local playerData = Framework.GetPlayerData()
-    print("^3[Haus-Manager Sell]^7 Player citizenid:", playerData.citizenid)
-    print("^3[Haus-Manager Sell]^7 Owner citizenid:", property.owner_identifier)
+    local playerIdentifier = nil
     
-    if property.owner_identifier ~= playerData.citizenid then
+    -- ESX uses 'identifier', QB-Core uses 'citizenid'
+    if Framework.Type == 'esx' then
+        playerIdentifier = playerData.identifier
+        print("^3[Haus-Manager Sell]^7 ESX - Player identifier:", playerIdentifier)
+    elseif Framework.Type == 'qb-core' then
+        playerIdentifier = playerData.citizenid
+        print("^3[Haus-Manager Sell]^7 QB-Core - Player citizenid:", playerIdentifier)
+    end
+    
+    print("^3[Haus-Manager Sell]^7 Property owner_identifier:", property.owner_identifier)
+    
+    if not playerIdentifier then
+        print("^1[Haus-Manager Sell ERROR]^7 Could not get player identifier!")
+        Framework.Notify("Fehler: Spieler-Identifikation nicht gefunden!", 'error')
+        return
+    end
+    
+    if property.owner_identifier ~= playerIdentifier then
+        print("^1[Haus-Manager Sell]^7 Ownership check FAILED!")
+        print("^1[Haus-Manager Sell]^7 Expected: " .. tostring(property.owner_identifier))
+        print("^1[Haus-Manager Sell]^7 Got: " .. tostring(playerIdentifier))
         Framework.Notify("Sie sind nicht der Eigentümer dieser Immobilie!", 'error')
         return
     end
+    
+    print("^2[Haus-Manager Sell]^7 Ownership check PASSED!")
     
     local sellPrice = math.floor(property.price * 0.5)
     print("^3[Haus-Manager Sell]^7 Opening sell menu, price:", property.price, "sell price:", sellPrice)
