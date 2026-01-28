@@ -92,19 +92,19 @@ Config.Interiors = {
         label = "Moderne Wohnung",
         type = "apartment",
         shell = "ModernHotel", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- Relative spawn point inside
+        spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Proper apartment spawn point
     },
     ["ClassicApartment"] = {
         label = "Klassische Wohnung",
         type = "apartment",
         shell = "DelPerroHeights", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Del Perro apartment spawn
     },
     ["LuxuryApartment"] = {
         label = "Luxus-Wohnung",
         type = "apartment",
         shell = "EclipseTowers", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Eclipse Towers spawn
     },
     
     -- Houses
@@ -112,19 +112,19 @@ Config.Interiors = {
         label = "Standard-Haus",
         type = "house",
         shell = "FranklinHouse", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Franklin house spawn
     },
     ["ModernHouse"] = {
         label = "Modernes Haus",
         type = "house",
         shell = "MichaelHouse", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Michael house spawn
     },
     ["LuxuryHouse"] = {
         label = "Luxus-Haus",
         type = "house",
         shell = "TrevorHouse", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Trevor house spawn
     },
     
     -- Offices
@@ -132,19 +132,19 @@ Config.Interiors = {
         label = "Kleines Büro",
         type = "office",
         shell = "OfficeLow", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- Low-end office spawn
     },
     ["MediumOffice"] = {
         label = "Mittleres Büro",
         type = "office",
         shell = "OfficeMid", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- Mid-range office spawn
     },
     ["LargeOffice"] = {
         label = "Großes Büro",
         type = "office",
         shell = "OfficeHigh", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- High-end office spawn
     }
 }
 

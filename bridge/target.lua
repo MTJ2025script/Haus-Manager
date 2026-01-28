@@ -244,10 +244,4 @@ function DrawText3D(x, y, z, text)
     ClearDrawOrigin()
 end
 
--- Start DrawText thread if in DrawText mode
-CreateThread(function()
-    Wait(100) -- Small delay to ensure everything is loaded
-    Target.StartDrawTextMode()
-end)
-
-print("^2[Haus-Manager Target Bridge]^7 Target system ready, Type: " .. (Target.Type or "DrawText"))
+print("^2[Haus-Manager Target Bridge]^7 Target bridge loaded successfully")

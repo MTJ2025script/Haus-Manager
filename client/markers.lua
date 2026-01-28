@@ -452,8 +452,17 @@ end)
 
 -- Close menu event
 RegisterNetEvent('haus-manager:client:closeMenu', function()
-    -- Menu systems handle this internally
     print("^3[Haus-Manager Events]^7 Close menu event triggered")
+    Menu.Close()
+    
+    -- Re-enable ox_target if it was disabled
+    if Target and Target.Type == 'ox_target' then
+        Citizen.SetTimeout(100, function()
+            pcall(function()
+                exports.ox_target:disableTargeting(false)
+            end)
+        end)
+    end
 end)
 
 -- Open sell menu event
