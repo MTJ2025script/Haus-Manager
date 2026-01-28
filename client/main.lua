@@ -406,8 +406,51 @@ function EnterProperty(property)
     print("^2[Haus-Manager EnterProperty]^7 Richte Innenraum-Marker ein (Safe, Garderobe)")
     TriggerEvent('haus-manager:client:setupInteriorMarkers', property)
     
+    -- CRITICAL FIX: Create exit marker at spawn location
+    print("^2[Haus-Manager EnterProperty]^7 Erstelle Ausgangs-Marker im Interior")
+    CreateInteriorExitMarker(spawnCoords)
+    
     Framework.Notify(Config.Notifications["entered_property"] or "Immobilie betreten", 'success')
     print("^2[Haus-Manager EnterProperty]^7 Immobilie erfolgreich betreten - Spieler ist jetzt drinnen")
+end
+
+-- Create exit marker inside property
+function CreateInteriorExitMarker(spawnCoords)
+    CreateThread(function()
+        -- Platziere Exit-Marker an der Tür/Spawn-Position (wo Spieler reinkam)
+        -- Dies stellt sicher dass Spieler den Ausgang immer finden
+        local exitCoords = vector3(spawnCoords.x, spawnCoords.y, spawnCoords.z)
+        
+        while isInProperty do
+            Wait(0)
+            
+            local playerCoords = GetEntityCoords(PlayerPedId())
+            local distance = #(playerCoords - exitCoords)
+            
+            if distance <= 50.0 then
+                -- Zeichne Exit-Marker (weiß/transparent für Ausgang) - AUF DEM BODEN
+                DrawMarker(
+                    1, -- Zylinder
+                    exitCoords.x, exitCoords.y, exitCoords.z - 0.95, -- Leicht unter Spawn-Point um AUF dem Boden zu sein
+                    0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0,
+                    0.5, 0.5, 0.3, -- KLEINER Marker (nicht 1.2, 1.2, 0.8)
+                    255, 255, 255, 120, -- WEIß und halbtransparent (nicht grün!)
+                    false, false, 2, false, nil, nil, false
+                )
+                
+                if distance <= 3.0 then
+                    DrawText3D(exitCoords.x, exitCoords.y, exitCoords.z + 0.5, "[~g~E~w~] Immobilie verlassen")
+                    
+                    if IsControlJustReleased(0, 38) then -- E Taste
+                        ExitProperty() -- Rufe ExitProperty() statt ExitInterior()
+                    end
+                end
+            else
+                Wait(500)
+            end
+        end
+    end)
 end
 
 -- Exit property
