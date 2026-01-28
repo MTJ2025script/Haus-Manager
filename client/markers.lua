@@ -442,29 +442,7 @@ RegisterNetEvent('haus-manager:client:closeMenu', function()
     Menu.Close()
 end)
 
--- Open sell menu event
-RegisterNetEvent('haus-manager:client:openSellMenu', function(data)
-    print("^2[Haus-Manager Events]^7 openSellMenu event triggered")
-    
-    local property = nil
-    if type(data) == "table" then
-        if data.property then
-            property = data.property
-        elseif data.property_id then
-            property = data
-        end
-    end
-    
-    if property and property.property_id then
-        SetNuiFocus(true, true)
-        SendNUIMessage({
-            action = "openSellUI",
-            property = property
-        })
-    else
-        print("^1[Haus-Manager Events ERROR]^7 Invalid property data for sell menu!")
-    end
-end)
+-- Note: openSellMenu event handler is in client/sell.lua (don't duplicate here!)
 
 -- Draw 3D text
 function DrawText3D(x, y, z, text)

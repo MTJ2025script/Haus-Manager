@@ -345,19 +345,18 @@ function EnterProperty(property)
     
     print("^2[Haus-Manager EnterProperty]^7 Interior config found, type: " .. tostring(interiorType))
     
-    -- CRITICAL: Store current exterior position BEFORE teleporting
-    local ped = PlayerPedId()
-    local exteriorCoords = GetEntityCoords(ped)
-    print("^2[Haus-Manager EnterProperty]^7 Storing exterior coords: " .. exteriorCoords.x .. ", " .. exteriorCoords.y .. ", " .. exteriorCoords.z)
-    
-    -- Parse property coordinates to get heading
+    -- CRITICAL: Store PROPERTY MARKER position for exit (NOT player position!)
+    -- This ensures player exits at the SAME location as the property marker
     local propertyCoords = json.decode(property.coords)
+    local exteriorCoords = vector3(propertyCoords.x, propertyCoords.y, propertyCoords.z)
     local exteriorHeading = propertyCoords.heading or 0.0
+    print("^2[Haus-Manager EnterProperty]^7 Storing MARKER coords for exit: " .. exteriorCoords.x .. ", " .. exteriorCoords.y .. ", " .. exteriorCoords.z)
     
     -- Screen fade for smooth transition
     DoScreenFadeOut(500)
     
     -- Ensure player is not frozen before starting transition
+    local ped = PlayerPedId()
     FreezeEntityPosition(ped, false)
     SetPlayerControl(PlayerId(), true, 0)
     
