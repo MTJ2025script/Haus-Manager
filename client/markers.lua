@@ -442,7 +442,7 @@ RegisterNetEvent('haus-manager:client:closeMenu', function()
     Menu.Close()
 end)
 
--- Note: openSellMenu event handler is in client/sell.lua (don't duplicate here!)
+-- Hinweis: openSellMenu Event-Handler ist in client/sell.lua (nicht hier duplizieren!)
 
 -- Draw 3D text
 function DrawText3D(x, y, z, text)
