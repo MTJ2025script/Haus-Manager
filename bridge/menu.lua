@@ -82,13 +82,32 @@ function Menu.Open(menuData)
         
         for _, item in ipairs(menuData) do
             if not item.isMenuHeader then
-                table.insert(elements, {
+                -- ESX Context braucht einen onSelect callback
+                local menuOption = {
                     title = item.header or item.txt,
-                    description = item.txt,
-                    event = item.params and item.params.event,
-                    args = item.params and item.params.args,
-                    server = item.params and item.params.isServer or false
-                })
+                    description = item.txt
+                }
+                
+                -- Wenn es ein Event gibt, füge onSelect hinzu
+                if item.params and item.params.event then
+                    menuOption.onSelect = function()
+                        print("^2[Haus-Manager Menu]^7 ESX Context option selected: " .. item.header)
+                        
+                        -- Event auslösen
+                        if item.params.isServer then
+                            print("^2[Haus-Manager Menu]^7 Triggering server event: " .. item.params.event)
+                            TriggerServerEvent(item.params.event, item.params.args)
+                        else
+                            print("^2[Haus-Manager Menu]^7 Triggering client event: " .. item.params.event)
+                            TriggerEvent(item.params.event, item.params.args)
+                        end
+                        
+                        -- Menü nach Event schließen (wichtig für ESX!)
+                        exports['esx_context']:Close()
+                    end
+                end
+                
+                table.insert(elements, menuOption)
             end
         end
         
@@ -99,6 +118,14 @@ function Menu.Open(menuData)
     elseif Menu.Type == 'esx_menu_default' then
         -- ESX Menu Default doesn't support custom events in elements
         -- We need to handle this differently - trigger events directly without using ESX's event system
+        
+        -- Stelle sicher, dass ESX verfügbar ist
+        if not Framework or not Framework.Object then
+            print("^1[Haus-Manager Menu ERROR]^7 ESX Framework object not available!")
+            return
+        end
+        
+        local ESX = Framework.Object
         local elements = {}
         local eventMap = {} -- Map value to event data
         
@@ -121,7 +148,7 @@ function Menu.Open(menuData)
             end
         end
         
-        print("^3[Haus-Manager Menu]^7 Opening ESX menu with " .. #elements .. " options")
+        print("^2[Haus-Manager Menu]^7 Opening ESX Menu Default with " .. #elements .. " options")
         print("^3[Haus-Manager Menu Debug]^7 ESX object exists: " .. tostring(ESX ~= nil))
         print("^3[Haus-Manager Menu Debug]^7 ESX.UI exists: " .. tostring(ESX and ESX.UI ~= nil))
         print("^3[Haus-Manager Menu Debug]^7 ESX.UI.Menu exists: " .. tostring(ESX and ESX.UI and ESX.UI.Menu ~= nil))
@@ -182,17 +209,25 @@ end
 
 -- Close Menu
 function Menu.Close()
+    print("^2[Haus-Manager Menu]^7 Menu.Close() called, Type: " .. tostring(Menu.Type))
+    
     if Menu.Type == 'qb-menu' then
         TriggerEvent('qb-menu:client:closeMenu')
+        print("^2[Haus-Manager Menu]^7 QB-Menu close event triggered")
     elseif Menu.Type == 'esx_context' then
         exports['esx_context']:Close()
+        print("^2[Haus-Manager Menu]^7 ESX Context closed")
     elseif Menu.Type == 'esx_menu_default' then
-        ESX.UI.Menu.CloseAll()
+        if Framework and Framework.Object then
+            Framework.Object.UI.Menu.CloseAll()
+            print("^2[Haus-Manager Menu]^7 ESX Menu Default closed")
+        end
     else
         SendNUIMessage({
             action = "closeMenu"
         })
         SetNuiFocus(false, false)
+        print("^2[Haus-Manager Menu]^7 NUI menu closed")
     end
 end
 
