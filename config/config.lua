@@ -97,38 +97,38 @@ Config.RentPeriods = {
 --   - Büros: "OfficeStandard" (falls verfügbar statt "OfficeLow")
 --
 Config.Interiors = {
-    -- Apartments (ESX-kompatible Koordinaten)
+    -- Apartments (ESX-kompatible Koordinaten - UNTERSCHIEDLICHE Interiors!)
     ["ModernApartment"] = {
         label = "Moderne Wohnung",
         type = "apartment",
         shell = "ModernHotel",
-        spawn = vector4(266.06, -1007.43, -101.01, 0.0), -- Funktionierendes Apartment Interior
-        safe_coords = vector4(260.0, -1003.0, -99.0, 90.0),
-        wardrobe_coords = vector4(263.0, -1000.5, -99.0, 180.0)
+        spawn = vector4(-782.41, 318.45, 217.67, 355.45), -- Del Perro Heights Interior
+        safe_coords = vector4(-787.0, 323.0, 217.67, 90.0),
+        wardrobe_coords = vector4(-784.0, 320.0, 217.67, 180.0)
     },
     ["ClassicApartment"] = {
         label = "Klassische Wohnung",
         type = "apartment",
         shell = "DelPerroHeights",
-        spawn = vector4(265.0, -1007.0, -101.0, 0.0),
-        safe_coords = vector4(259.0, -1003.0, -99.0, 90.0),
-        wardrobe_coords = vector4(262.0, -1000.0, -99.0, 180.0)
+        spawn = vector4(266.06, -1007.43, -101.01, 0.0), -- Standard Apartment Interior
+        safe_coords = vector4(260.0, -1003.0, -99.0, 90.0),
+        wardrobe_coords = vector4(263.0, -1000.5, -99.0, 180.0)
     },
     ["LuxuryApartment"] = {
         label = "Luxus-Wohnung",
         type = "apartment",
         shell = "EclipseTowers",
-        spawn = vector4(267.0, -1008.0, -101.0, 0.0),
-        safe_coords = vector4(261.0, -1004.0, -99.0, 90.0),
-        wardrobe_coords = vector4(264.0, -1001.0, -99.0, 180.0)
+        spawn = vector4(-269.0, -957.0, 31.22, 210.0), -- Luxury High-End Interior
+        safe_coords = vector4(-274.0, -953.0, 31.22, 90.0),
+        wardrobe_coords = vector4(-271.0, -955.0, 31.22, 180.0)
     },
     
-    -- Häuser (ESX-kompatible Koordinaten)
+    -- Häuser (ESX-kompatible Koordinaten - UNTERSCHIEDLICHE Locations!)
     ["StandardHouse"] = {
         label = "Standard-Haus",
         type = "house",
         shell = "FranklinHouse",
-        spawn = vector4(-174.35, 497.5, 137.65, 180.0), -- Franklin Area Interior
+        spawn = vector4(-174.35, 497.5, 137.65, 180.0), -- Franklin House Area
         safe_coords = vector4(-169.0, 493.0, 137.65, 270.0),
         wardrobe_coords = vector4(-171.0, 496.0, 137.65, 0.0)
     },
@@ -136,25 +136,25 @@ Config.Interiors = {
         label = "Modernes Haus",
         type = "house",
         shell = "MichaelHouse",
-        spawn = vector4(-175.0, 498.0, 137.5, 180.0),
-        safe_coords = vector4(-169.5, 493.5, 137.5, 270.0),
-        wardrobe_coords = vector4(-171.5, 496.5, 137.5, 0.0)
+        spawn = vector4(-14.0, -1441.0, 31.1, 180.0), -- Michael House Area (Rockford Hills)
+        safe_coords = vector4(-9.0, -1437.0, 31.1, 270.0),
+        wardrobe_coords = vector4(-11.0, -1439.0, 31.1, 0.0)
     },
     ["LuxuryHouse"] = {
         label = "Luxus-Haus",
         type = "house",
         shell = "TrevorHouse",
-        spawn = vector4(-173.0, 496.5, 137.8, 180.0),
-        safe_coords = vector4(-168.0, 492.5, 137.8, 270.0),
-        wardrobe_coords = vector4(-170.0, 495.5, 137.8, 0.0)
+        spawn = vector4(7.0, 539.0, 176.0, 160.0), -- Luxury Villa (Hollywood Hills)
+        safe_coords = vector4(12.0, 543.0, 176.0, 270.0),
+        wardrobe_coords = vector4(9.0, 541.0, 176.0, 0.0)
     },
     
-    -- Büros (ESX-kompatible Koordinaten)
+    -- Büros (ESX-kompatible Koordinaten - UNTERSCHIEDLICHE Gebäude!)
     ["SmallOffice"] = {
         label = "Kleines Büro",
         type = "office",
         shell = "OfficeLow",
-        spawn = vector4(-1003.09, -478.02, 50.03, 90.0), -- Office Building Interior
+        spawn = vector4(-1003.09, -478.02, 50.03, 90.0), -- Standard Office Building
         safe_coords = vector4(-1007.5, -474.0, 50.03, 180.0),
         wardrobe_coords = vector4(-1005.0, -476.5, 50.03, 270.0)
     },
@@ -162,17 +162,17 @@ Config.Interiors = {
         label = "Mittleres Büro",
         type = "office",
         shell = "OfficeMid",
-        spawn = vector4(-1002.5, -477.5, 50.0, 90.0),
-        safe_coords = vector4(-1007.0, -473.5, 50.0, 180.0),
-        wardrobe_coords = vector4(-1004.5, -476.0, 50.0, 270.0)
+        spawn = vector4(-141.0, -620.0, 168.82, 90.0), -- Maze Bank Tower
+        safe_coords = vector4(-136.89, -631.19, 168.82, 180.0),
+        wardrobe_coords = vector4(-139.0, -625.0, 168.82, 270.0)
     },
     ["LargeOffice"] = {
         label = "Großes Büro",
         type = "office",
         shell = "OfficeHigh",
-        spawn = vector4(-1004.0, -479.0, 50.1, 90.0),
-        safe_coords = vector4(-1008.0, -475.0, 50.1, 180.0),
-        wardrobe_coords = vector4(-1005.5, -477.5, 50.1, 270.0)
+        spawn = vector4(-75.0, -826.0, 243.4, 160.0), -- Arcadius Business Center (Luxury)
+        safe_coords = vector4(-70.0, -830.0, 243.4, 180.0),
+        wardrobe_coords = vector4(-73.0, -828.0, 243.4, 270.0)
     }
 }
 
