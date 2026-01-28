@@ -41,7 +41,7 @@ function Target.Initialize()
     -- Check for ox_target (Modern alternative)
     if GetResourceState('ox_target') == 'started' then
         local success = pcall(function()
-            local test = exports.ox_target
+            local test = exports['ox_target']
             if test and test.addBoxZone then
                 Target.Type = 'ox_target'
                 print("^2[Haus-Manager Target Bridge]^7 ox_target erkannt")
@@ -55,7 +55,7 @@ function Target.Initialize()
     -- Check for qtarget (Alternative)
     if GetResourceState('qtarget') == 'started' then
         local success = pcall(function()
-            local test = exports.qtarget
+            local test = exports['qtarget']
             if test and test.AddBoxZone then
                 Target.Type = 'qtarget'
                 print("^2[Haus-Manager Target Bridge]^7 qtarget erkannt")
@@ -89,7 +89,7 @@ function Target.AddBoxZone(name, coords, length, width, options, targetOptions)
             })
         end
         
-        exports.ox_target:addBoxZone({
+        exports['ox_target']:addBoxZone({
             coords = coords,
             size = vec3(length, width, options.minZ and (options.maxZ - options.minZ) or 2.0),
             rotation = options.heading or 0.0,
@@ -99,7 +99,7 @@ function Target.AddBoxZone(name, coords, length, width, options, targetOptions)
         
         print("^2[Haus-Manager Target]^7 ox_target zone added: " .. name)
     elseif Target.Type == 'qtarget' then
-        exports.qtarget:AddBoxZone(name, coords, length, width, options, targetOptions)
+        exports['qtarget']:AddBoxZone(name, coords, length, width, options, targetOptions)
     else
         -- DrawText mode - store zone info for proximity checks
         Target.ActiveZones[name] = {
@@ -125,11 +125,11 @@ function Target.RemoveZone(name)
         end
     elseif Target.Type == 'ox_target' then
         pcall(function()
-            exports.ox_target:removeZone(name)
+            exports['ox_target']:removeZone(name)
         end)
     elseif Target.Type == 'qtarget' then
         pcall(function()
-            exports.qtarget:RemoveZone(name)
+            exports['qtarget']:RemoveZone(name)
         end)
     else
         Target.ActiveZones[name] = nil
