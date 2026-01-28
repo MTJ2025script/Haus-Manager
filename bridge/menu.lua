@@ -80,8 +80,10 @@ function Menu.Open(menuData)
         -- Convert to ESX Context format
         local elements = {}
         
-        for _, item in ipairs(menuData) do
+        for i, item in ipairs(menuData) do
             if not item.isMenuHeader then
+                print("^3[Haus-Manager Menu Debug]^7 Processing menu item " .. i .. ": " .. tostring(item.header))
+                
                 -- ESX Context braucht einen onSelect callback
                 local menuOption = {
                     title = item.header or item.txt,
@@ -90,8 +92,12 @@ function Menu.Open(menuData)
                 
                 -- Wenn es ein Event gibt, füge onSelect hinzu
                 if item.params and item.params.event then
+                    print("^3[Haus-Manager Menu Debug]^7 Item has event: " .. item.params.event)
+                    
                     menuOption.onSelect = function()
-                        print("^2[Haus-Manager Menu]^7 ESX Context option selected: " .. item.header)
+                        print("^2[Haus-Manager Menu]^7 ESX Context option selected: " .. (item.header or "unknown"))
+                        print("^2[Haus-Manager Menu]^7 Event: " .. item.params.event)
+                        print("^2[Haus-Manager Menu]^7 Args type: " .. type(item.params.args))
                         
                         -- Event auslösen
                         if item.params.isServer then
@@ -103,8 +109,11 @@ function Menu.Open(menuData)
                         end
                         
                         -- Menü nach Event schließen (wichtig für ESX!)
+                        print("^2[Haus-Manager Menu]^7 Closing ESX Context menu")
                         exports['esx_context']:Close()
                     end
+                else
+                    print("^1[Haus-Manager Menu ERROR]^7 Item has NO event!")
                 end
                 
                 table.insert(elements, menuOption)
@@ -112,6 +121,10 @@ function Menu.Open(menuData)
         end
         
         print("^2[Haus-Manager Menu]^7 Calling esx_context:Open with " .. #elements .. " elements")
+        for i, elem in ipairs(elements) do
+            print("^3[Haus-Manager Menu Debug]^7 Element " .. i .. ": " .. tostring(elem.title) .. " has onSelect: " .. tostring(elem.onSelect ~= nil))
+        end
+        
         exports['esx_context']:Open('center', elements)
         print("^2[Haus-Manager Menu]^7 ESX Context menu opened successfully")
         
