@@ -9,7 +9,7 @@ function EnterInterior(property)
     local interiorConfig = Config.Interiors[interiorType]
     
     if not interiorConfig then
-        QBCore.Functions.Notify("Ungültiger Innenraum!", 'error')
+        Framework.Notify("Ungültiger Innenraum!", 'error')
         return
     end
     
@@ -70,7 +70,7 @@ function EnterInterior(property)
     
     insideProperty = true
     
-    QBCore.Functions.Notify(Config.Notifications["entered_property"], 'success')
+    Framework.Notify(Config.Notifications["entered_property"], 'success')
     
     -- Create exit marker
     CreateInteriorExitMarker(interiorSpawn)
@@ -82,7 +82,7 @@ end
 -- Exit interior
 function ExitInterior()
     if not currentInterior then
-        QBCore.Functions.Notify("Sie sind nicht in einer Immobilie!", 'error')
+        Framework.Notify("Sie sind nicht in einer Immobilie!", 'error')
         return
     end
     
@@ -108,7 +108,7 @@ function ExitInterior()
     Wait(500)
     DoScreenFadeIn(500)
     
-    QBCore.Functions.Notify(Config.Notifications["exited_property"], 'success')
+    Framework.Notify(Config.Notifications["exited_property"], 'success')
 end
 
 -- Create interior furniture (simplified version)
@@ -240,7 +240,7 @@ RegisterCommand('exit', function()
     Wait(500)
     DoScreenFadeIn(500)
     
-    QBCore.Functions.Notify("Notausgang benutzt - Sie wurden teleportiert!", 'success')
+    Framework.Notify("Notausgang benutzt - Sie wurden teleportiert!", 'success')
 end, false)
 
 -- Player loaded event - just initialize interior state (NO AUTO-SPAWN)
