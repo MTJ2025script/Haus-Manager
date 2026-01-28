@@ -230,7 +230,7 @@ function AddPropertyTargetZone(property, coords, zoneName)
     })
 end
 
--- Thread 3: Visual marker renderer (draws markers AND 3D text labels)
+-- Thread 3: Visual marker renderer (draws markers only, NO text labels)
 -- Target zones handle all interactions now
 CreateThread(function()
     while true do
@@ -256,14 +256,8 @@ CreateThread(function()
             sleep = false
             DrawMarkerWithRadius(data.coords, Config.Markers, data.markerRadius)
             
-            -- Draw 3D text label with icon when close enough
-            if distance < 10.0 then
-                local text = "🏠 " .. data.property.property_name
-                if data.property.owned == 1 then
-                    text = "🏠 " .. data.property.property_name .. " (Besetzt)"
-                end
-                DrawText3D(data.coords.x, data.coords.y, data.coords.z + 1.0, text)
-            end
+            -- NO 3D TEXT HERE - Target system handles interaction prompts now!
+            -- This prevents double display (marker + target prompt)
         end
         
         if sleep then
