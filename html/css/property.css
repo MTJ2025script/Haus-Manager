@@ -1,0 +1,237 @@
+/* Property Purchase/Rent UI Styles */
+
+.property-panel {
+    max-width: 600px;
+}
+
+.property-info {
+    background: var(--background);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row .label {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 14px;
+}
+
+.info-row .value {
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.info-row .price {
+    color: var(--success);
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.purchase-section,
+.rent-section {
+    margin-bottom: 25px;
+}
+
+.purchase-section h3,
+.rent-section h3 {
+    color: var(--text-dark);
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.purchase-section p,
+.rent-section p {
+    color: var(--text-light);
+    margin-bottom: 15px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.rent-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.rent-option {
+    background: var(--background);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.rent-option:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(173, 255, 47, 0.2);
+}
+
+.rent-option-period {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.rent-option-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 5px;
+}
+
+.rent-option-desc {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.rent-option.selected {
+    border-color: var(--primary-color);
+    background: rgba(173, 255, 47, 0.1);
+}
+
+/* Property type icons */
+.property-type-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 24px;
+}
+
+/* Price display */
+.price-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--success), #28a428);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 18px;
+    box-shadow: 0 2px 8px rgba(50, 205, 50, 0.3);
+}
+
+/* Features list */
+.features-list {
+    background: var(--background);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.features-list h4 {
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    color: var(--text-dark);
+    font-size: 14px;
+}
+
+.feature-item::before {
+    content: '✓';
+    background: var(--primary-color);
+    color: var(--text-dark);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .rent-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Sell to Player UI Styles */
+.sell-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.sell-actions button {
+    flex: 1;
+}
+
+.sell-actions .btn-large {
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+#sellToPlayerUI .ui-panel {
+    max-width: 600px;
+}
+
+#sellToPlayerUI .form-section {
+    margin-top: 20px;
+}
+
+#sellToPlayerUI .form-section h3 {
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    font-size: 18px;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+}
+
+#sellToPlayerUI select,
+#sellToPlayerUI input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--background);
+    color: var(--text-dark);
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+#sellToPlayerUI select:focus,
+#sellToPlayerUI input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+#sellToPlayerUI .property-info {
+    background: linear-gradient(135deg, rgba(173, 255, 47, 0.05), rgba(173, 255, 47, 0.15));
+    border-left: 4px solid var(--primary-color);
+}
+

@@ -1,0 +1,256 @@
+/* Admin UI Specific Styles */
+
+.properties-list {
+    margin-top: 30px;
+}
+
+.properties-list h3 {
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.property-item {
+    background: var(--background);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: all 0.2s;
+}
+
+.property-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+.property-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.property-item-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.property-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-apartment {
+    background: #E0F7FA;
+    color: #006064;
+}
+
+.badge-house {
+    background: #FFF9C4;
+    color: #F57F17;
+}
+
+.badge-office {
+    background: #F3E5F5;
+    color: #4A148C;
+}
+
+.badge-owned {
+    background: #2196F3;
+    color: white;
+    margin-left: 5px;
+}
+
+.badge-available {
+    background: #4CAF50;
+    color: white;
+    margin-left: 5px;
+}
+
+.badge-partial {
+    background: #FFC107;
+    color: #000;
+    margin-left: 5px;
+}
+
+.badge-rented {
+    background: #FF9800;
+    color: white;
+    margin-left: 5px;
+}
+
+.badge-rented-to-you {
+    background: #F44336;
+    color: white;
+    margin-left: 5px;
+}
+
+.property-item-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    color: var(--text-light);
+}
+
+.info-item strong {
+    color: var(--text-dark);
+    margin-right: 5px;
+}
+
+.property-item-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.property-item-actions button {
+    flex: 1;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.empty-state-text {
+    font-size: 16px;
+}
+
+/* Loading spinner */
+.spinner {
+    border: 3px solid var(--border-color);
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Toast notifications */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 8px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 12px var(--shadow);
+    animation: slideInRight 0.3s ease-out;
+    z-index: 2000;
+    max-width: 350px;
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.toast.success {
+    border-left: 4px solid var(--success);
+}
+
+.toast.error {
+    border-left: 4px solid var(--error);
+}
+
+.toast.info {
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Modal Styles */
+.modal {
+    z-index: 9999;
+}
+
+.modal .ui-panel {
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+.modal-actions button {
+    min-width: 120px;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Delete button for safe/wardrobe coordinates */
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.delete-btn:active {
+    transform: translateY(0);
+}

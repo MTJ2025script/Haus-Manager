@@ -1,0 +1,348 @@
+/* Main Styles - Yellow-Green GTA V Theme */
+:root {
+    --primary-color: #ADFF2F; /* Yellow-Green (GTA V grass style) */
+    --primary-dark: #9ACD32;
+    --secondary-color: #FFD700; /* Gold accent */
+    --background: #F5F5F5; /* Light background */
+    --panel-bg: #FFFFFF;
+    --text-dark: #2C2C2C;
+    --text-light: #666666;
+    --border-color: #DDDDDD;
+    --success: #32CD32;
+    --error: #FF4444;
+    --shadow: rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: transparent;
+    color: var(--text-dark);
+    overflow: hidden;
+}
+
+.ui-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    background-image: url('../img/ui-background.png');
+    background-size: cover;
+    background-position: center;
+    z-index: 1000;
+}
+
+/* Admin UI - Specific Background */
+#adminUI.ui-container {
+    background-image: url('../img/admin-ui-background.png');
+}
+
+/* Player Property UI - Specific Background */
+#propertyUI.ui-container {
+    background-image: url('../img/player-ui-background.png');
+}
+
+.ui-panel {
+    background: var(--panel-bg);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px var(--shadow);
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.3s ease-out;
+    position: relative;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ui-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: var(--text-dark);
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--secondary-color);
+}
+
+.ui-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.close-btn {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: var(--text-dark);
+    font-size: 24px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: rotate(90deg);
+}
+
+.ui-content {
+    padding: 25px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Form Styles */
+.form-section {
+    margin-bottom: 30px;
+}
+
+.form-section h3 {
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+    font-size: 18px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-dark);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(173, 255, 47, 0.1);
+}
+
+.form-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+/* Buttons */
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: var(--text-dark);
+    margin-bottom: 15px;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(173, 255, 47, 0.3);
+}
+
+.btn-success {
+    background: var(--success);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #28a428;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(50, 205, 50, 0.3);
+}
+
+.btn-large {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.btn-danger {
+    background: var(--error);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #cc0000;
+}
+
+.btn-edit {
+    background: var(--secondary-color);
+    color: var(--text-dark);
+    padding: 8px 16px;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+.btn-edit:hover {
+    background: #DAA520;
+}
+
+/* Scrollbar */
+.ui-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ui-content::-webkit-scrollbar-track {
+    background: var(--background);
+    border-radius: 10px;
+}
+
+.ui-content::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+.ui-content::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
+
+/* Utility Classes */
+.divider {
+    text-align: center;
+    margin: 25px 0;
+    position: relative;
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 2px;
+    background: var(--border-color);
+}
+
+.divider::before {
+    left: 0;
+}
+
+.divider::after {
+    right: 0;
+}
+
+/* Custom Confirmation Dialog */
+.confirm-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.confirm-dialog-content {
+    background: var(--background);
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    min-width: 400px;
+    max-width: 500px;
+    animation: slideIn 0.3s ease;
+}
+
+.confirm-dialog-header {
+    background: var(--header-bg);
+    padding: 20px;
+    border-bottom: 2px solid var(--border-color);
+    border-radius: 8px 8px 0 0;
+}
+
+.confirm-dialog-header h3 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 22px;
+}
+
+.confirm-dialog-body {
+    padding: 30px;
+    text-align: center;
+}
+
+.confirm-dialog-body p {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.confirm-dialog-actions {
+    padding: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    border-top: 1px solid var(--border-color);
+}
+
+.confirm-dialog-actions button {
+    min-width: 120px;
+    padding: 12px 24px;
+    font-size: 16px;
+}

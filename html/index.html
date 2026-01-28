@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haus-Manager</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/property.css">
+    <link rel="stylesheet" href="css/keymanager.css">
+    <link rel="stylesheet" href="css/keyhud.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Admin UI for creating properties -->
+    <div id="adminUI" class="ui-container" style="display: none;">
+        <div class="ui-panel">
+            <div class="ui-header">
+                <h2>Immobilien-Verwaltung</h2>
+                <button class="close-btn" onclick="closeUI()">✕</button>
+            </div>
+            
+            <div class="ui-content">
+                <div class="form-section">
+                    <h3>Neue Immobilie erstellen</h3>
+                    
+                    <div class="form-group">
+                        <label>Immobilientyp</label>
+                        <select id="propertyType">
+                            <option value="apartment">Wohnung</option>
+                            <option value="house">Haus</option>
+                            <option value="office">Büro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Name der Immobilie</label>
+                        <input type="text" id="propertyName" placeholder="z.B. Eclipse Towers Apt 1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Innenraum-Typ</label>
+                        <select id="interiorType">
+                            <!-- Will be populated dynamically -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Preis ($)</label>
+                        <input type="number" id="propertyPrice" placeholder="50000" min="0">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Position X</label>
+                            <input type="number" step="0.01" id="coordX" placeholder="0.0">
+                        </div>
+                        <div class="form-group">
+                            <label>Position Y</label>
+                            <input type="number" step="0.01" id="coordY" placeholder="0.0">
+                        </div>
+                        <div class="form-group">
+                            <label>Position Z</label>
+                            <input type="number" step="0.01" id="coordZ" placeholder="0.0">
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="getPlayerPosition()">Aktuelle Position verwenden</button>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="markerVisible" checked>
+                            Marker sichtbar
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Sichtbarkeitsradius (Meter)</label>
+                        <input type="number" id="markerRadius" placeholder="50.0" value="50.0" min="1" max="500">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🔒 Safe Position (Vec4)</label>
+                        <input type="text" id="safeCoords" placeholder="x, y, z, heading (z.B. -800.5, 320.2, 215.3, 90)">
+                        <small style="color: #888; display: block; margin-top: 5px;">
+                            Optional - Vec4 Position für Safe (Tresor) Interaktion
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>👔 Garderobe Position (Vec4)</label>
+                        <input type="text" id="wardrobeCoords" placeholder="x, y, z, heading (z.B. -802.1, 318.5, 215.3, 180)">
+                        <small style="color: #888; display: block; margin-top: 5px;">
+                            Optional - Vec4 Position für Garderobe (Kleidung) Interaktion
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="allowMultiOwner">
+                            Mehrfach-Verkauf erlauben (mehrere Eigentümer)
+                        </label>
+                    </div>
+                    
+                    <div class="form-group" id="maxOwnersGroup" style="display: none;">
+                        <label>Maximale Anzahl Eigentümer</label>
+                        <select id="maxOwners">
+                            <option value="1">1 (Standard - Ein Eigentümer)</option>
+                            <option value="2">2 (Zwei Eigentümer)</option>
+                            <option value="3">3 (Drei Eigentümer)</option>
+                        </select>
+                        <small style="color: #888; display: block; margin-top: 5px;">
+                            Ermöglicht mehreren Spielern, dieselbe Immobilie zu besitzen
+                        </small>
+                    </div>
+                    
+                    <button class="btn-success btn-large" onclick="createProperty()">Immobilie erstellen</button>
+                </div>
+                
+                <div class="properties-list">
+                    <h3>Vorhandene Immobilien</h3>
+                    <div id="propertiesList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Garage Admin UI -->
+    <div id="garageUI" class="ui-container" style="display: none;">
+        <div class="ui-panel">
+            <div class="ui-header">
+                <h2>Garagen-Verwaltung</h2>
+                <button class="close-btn" onclick="closeUI()">✕</button>
+            </div>
+            
+            <div class="ui-content">
+                <div class="form-section">
+                    <h3>Garage zu Immobilie hinzufügen</h3>
+                    
+                    <div class="form-group">
+                        <label>Immobilie auswählen</label>
+                        <select id="garagePropertySelect">
+                            <!-- Will be populated dynamically -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Garagengröße</label>
+                        <select id="garageSize">
+                            <option value="small">Klein (2 Fahrzeuge)</option>
+                            <option value="medium">Mittel (6 Fahrzeuge)</option>
+                            <option value="large">Groß (10 Fahrzeuge)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Garage Position X</label>
+                            <input type="number" step="0.01" id="garageCoordX" placeholder="0.0">
+                        </div>
+                        <div class="form-group">
+                            <label>Garage Position Y</label>
+                            <input type="number" step="0.01" id="garageCoordY" placeholder="0.0">
+                        </div>
+                        <div class="form-group">
+                            <label>Garage Position Z</label>
+                            <input type="number" step="0.01" id="garageCoordZ" placeholder="0.0">
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="getGaragePosition()">Aktuelle Position verwenden</button>
+                    
+                    <button class="btn-success btn-large" onclick="addGarage()">Garage hinzufügen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Property Purchase/Rent UI -->
+    <div id="propertyUI" class="ui-container" style="display: none;">
+        <div class="ui-panel property-panel">
+            <div class="ui-header">
+                <h2 id="propTitle">Immobilie</h2>
+                <button class="close-btn" onclick="closeUI()">✕</button>
+            </div>
+            
+            <div class="ui-content">
+                <div class="property-info">
+                    <div class="info-row">
+                        <span class="label">Typ:</span>
+                        <span id="propType" class="value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Innenraum:</span>
+                        <span id="propInterior" class="value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Kaufpreis:</span>
+                        <span id="propPrice" class="value price"></span>
+                    </div>
+                </div>
+                
+                <div class="purchase-section">
+                    <h3>Kaufen</h3>
+                    <p>Einmaliger Kauf - die Immobilie gehört dauerhaft Ihnen.</p>
+                    <button class="btn-success btn-large" onclick="purchaseProperty()">
+                        Jetzt kaufen für <span id="buyPrice"></span>
+                    </button>
+                </div>
+                
+                <div class="divider">ODER</div>
+                
+                <div class="rent-section">
+                    <h3>Mieten</h3>
+                    <p>Mieten Sie die Immobilie für einen bestimmten Zeitraum.</p>
+                    
+                    <div class="rent-options" id="rentOptions">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Property Modal -->
+    <div id="editPropertyModal" class="ui-container modal" style="display: none;">
+        <div class="ui-panel">
+            <div class="ui-header">
+                <h2>Immobilie bearbeiten</h2>
+                <button class="close-btn" onclick="closeEditModal()">✕</button>
+            </div>
+            
+            <div class="ui-content">
+                <div class="form-section">
+                    <input type="hidden" id="editPropertyId">
+                    
+                    <div class="form-group">
+                        <label>Immobilientyp</label>
+                        <select id="editPropertyType">
+                            <option value="apartment">Wohnung</option>
+                            <option value="house">Haus</option>
+                            <option value="office">Büro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Name der Immobilie</label>
+                        <input type="text" id="editPropertyName" placeholder="z.B. Eclipse Towers Apt 1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Innenraum-Typ</label>
+                        <select id="editInteriorType">
+                            <!-- Will be populated dynamically -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Preis ($)</label>
+                        <input type="number" id="editPropertyPrice" placeholder="50000" min="0">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Position X</label>
+                            <input type="number" step="0.01" id="editCoordX" placeholder="0.0">
+                        </div>
+                        <div class="form-group">
+                            <label>Position Y</label>
+                            <input type="number" step="0.01" id="editCoordY" placeholder="0.0">
+                        </div>
+                        <div class="form-group">
+                            <label>Position Z</label>
+                            <input type="number" step="0.01" id="editCoordZ" placeholder="0.0">
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="getEditPlayerPosition()">📍 Aktuelle Position</button>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="editMarkerVisible">
+                            Marker sichtbar
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Sichtbarkeitsradius (Meter)</label>
+                        <input type="number" id="editMarkerRadius" placeholder="50.0" min="1" max="500">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🔒 Safe Position (Vec4)</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="editSafeCoords" placeholder="x, y, z, heading" style="flex: 1;">
+                            <button type="button" class="delete-btn" onclick="clearSafeCoords()" title="Safe Koordinaten löschen">
+                                🗑️ Löschen
+                            </button>
+                        </div>
+                        <small style="color: #888; display: block; margin-top: 5px;">
+                            Optional - Vec4 Position für Safe Interaktion
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>👔 Garderobe Position (Vec4)</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="editWardrobeCoords" placeholder="x, y, z, heading" style="flex: 1;">
+                            <button type="button" class="delete-btn" onclick="clearWardrobeCoords()" title="Garderobe Koordinaten löschen">
+                                🗑️ Löschen
+                            </button>
+                        </div>
+                        <small style="color: #888; display: block; margin-top: 5px;">
+                            Optional - Vec4 Position für Garderobe Interaktion
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="editAllowMultiOwner">
+                            Mehrfach-Verkauf erlauben
+                        </label>
+                    </div>
+                    
+                    <div class="form-group" id="editMaxOwnersGroup" style="display: none;">
+                        <label>Maximale Anzahl Eigentümer</label>
+                        <select id="editMaxOwners">
+                            <option value="1">1 (Standard)</option>
+                            <option value="2">2 (Zwei Eigentümer)</option>
+                            <option value="3">3 (Drei Eigentümer)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button class="btn-success" onclick="savePropertyEdits()">Speichern</button>
+                        <button class="btn-secondary" onclick="closeEditModal()">Abbrechen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Custom Confirmation Dialog (replaces browser confirm()) -->
+    <div id="confirmDialog" class="confirm-dialog" style="display: none;">
+        <div class="confirm-dialog-content">
+            <div class="confirm-dialog-header">
+                <h3>Bestätigung</h3>
+            </div>
+            <div class="confirm-dialog-body">
+                <p id="confirmMessage"></p>
+            </div>
+            <div class="confirm-dialog-actions">
+                <button class="btn-success" onclick="confirmDialogYes()">Ja</button>
+                <button class="btn-secondary" onclick="confirmDialogNo()">Nein</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sell to Player UI -->
+    <div id="sellToPlayerUI" class="ui-container" style="display: none;">
+        <div class="ui-panel">
+            <div class="ui-header">
+                <h2>🏠 Immobilie an Spieler verkaufen</h2>
+                <button class="close-btn" onclick="closeSellUI()">✕</button>
+            </div>
+            
+            <div class="ui-content">
+                <div class="property-info">
+                    <div class="info-row">
+                        <span class="label">Immobilie:</span>
+                        <span id="sellPropertyName" class="value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Typ:</span>
+                        <span id="sellPropertyType" class="value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Ursprünglicher Preis:</span>
+                        <span id="sellPropertyOriginalPrice" class="value price"></span>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Verkaufsdetails</h3>
+                    
+                    <div class="form-group">
+                        <label>Käufer auswählen (in der Nähe)</label>
+                        <select id="sellTargetPlayer">
+                            <!-- Will be populated dynamically -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Verkaufspreis ($)</label>
+                        <input type="number" id="sellPrice" placeholder="0" min="0" max="99999999">
+                        <small style="color: #888; display: block; margin-top: 5px;">
+                            Empfohlener Preis: 50-100% des Originalpreises
+                        </small>
+                    </div>
+                    
+                    <div class="sell-actions">
+                        <button class="btn-success btn-large" onclick="confirmSellToPlayer()">
+                            💰 Verkauf abschließen
+                        </button>
+                        <button class="btn-secondary" onclick="closeSellUI()">
+                            ❌ Abbrechen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Key Management UI -->
+    <div id="keyManagementUI" class="ui-container" style="display: none;">
+        <div class="ui-panel key-management-panel">
+            <div class="ui-header">
+                <div class="header-title">
+                    <h2>🔑 Schlüsselverwaltung</h2>
+                    <div class="property-subtitle">
+                        <span id="keyMgmtPropertyName"></span>
+                        <span class="property-type-badge" id="keyMgmtPropertyType"></span>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="closeKeyManagement()">✕</button>
+            </div>
+            
+            <div class="ui-content key-management-content">
+                <!-- Current Keys Section -->
+                <div class="keys-section">
+                    <h3>
+                        <i class="fas fa-list"></i>
+                        Vergebene Schlüssel
+                    </h3>
+                    <div id="keysList" class="keys-list">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Grant Key Section -->
+                <div class="grant-key-section">
+                    <h3>
+                        <i class="fas fa-user-plus"></i>
+                        Schlüssel vergeben
+                    </h3>
+                    
+                    <div class="grant-key-form">
+                        <div class="form-group">
+                            <label>Spieler auswählen</label>
+                            <select id="grantKeyPlayer">
+                                <option value="">Keine Spieler in der Nähe</option>
+                            </select>
+                        </div>
+                        
+                        <div class="key-type-buttons">
+                            <div class="key-type-option">
+                                <h4>⏱️ Temporärer Schlüssel</h4>
+                                <p>Schlüssel läuft automatisch ab</p>
+                                <div class="duration-input">
+                                    <input type="number" id="keyDuration" value="24" min="1" max="168" step="1">
+                                    <span>Stunden</span>
+                                </div>
+                                <button class="btn-primary" onclick="grantTemporaryKey()">
+                                    <i class="fas fa-clock"></i> Temporär vergeben
+                                </button>
+                            </div>
+                            
+                            <div class="key-type-option">
+                                <h4>∞ Permanenter Schlüssel</h4>
+                                <p>Schlüssel läuft nie ab</p>
+                                <button class="btn-success" onclick="grantPermanentKey()">
+                                    <i class="fas fa-key"></i> Permanent vergeben
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mini-UI Key Notification -->
+    <div id="keyNotification" class="key-notification">
+        <!-- Populated dynamically -->
+    </div>
+    
+    <!-- Temporary Key HUD (Top Left) -->
+    <div id="keyHUD">
+        <!-- Populated dynamically with live key countdown -->
+    </div>
+    
+    <script src="js/main.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/property.js"></script>
+    <script src="js/sell.js"></script>
+    <script src="js/keymanager.js"></script>
+    <script src="js/keyhud.js"></script>
+</body>
+</html>
