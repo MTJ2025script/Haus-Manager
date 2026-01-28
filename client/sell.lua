@@ -125,8 +125,11 @@ RegisterNetEvent('haus-manager:client:sellToPlayer', function(data)
             return
         end
         
+        -- ESX FIX: Delays to ensure NUI is ready
+        print("^2[Haus-Manager Sell]^7 Opening sell to player UI")
+        Wait(100)
+        
         -- Open NUI with player list
-        SetNuiFocus(true, true)
         SendNUIMessage({
             action = "openSellToPlayer",
             property = {
@@ -136,6 +139,20 @@ RegisterNetEvent('haus-manager:client:sellToPlayer', function(data)
                 price = property.price
             },
             players = players
+        })
+        
+        -- ESX FIX: Small delay before setting focus
+        Wait(50)
+        SetNuiFocus(true, true)
+        
+        -- ESX FIX: Verify and ensure visibility
+        Wait(50)
+        print("^2[Haus-Manager Sell]^7 NUI focus set - UI should be visible")
+        
+        Wait(100)
+        SendNUIMessage({
+            action = 'ensureVisible',
+            ui = 'sellToPlayer'
         })
     end)
 end)

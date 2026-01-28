@@ -61,12 +61,28 @@ function OpenKeyManagementUI(property)
             }
             
             print('^2[Haus-Manager KeyManager]^7 Sending NUI message:', json.encode(messageData))
+            
+            -- ESX FIX: Small delay to ensure NUI is ready
+            Wait(100)
+            
             SendNUIMessage(messageData)
+            
+            -- ESX FIX: Another small delay before setting focus
+            Wait(50)
             
             print('^2[Haus-Manager KeyManager]^7 Setting NUI focus to true')
             SetNuiFocus(true, true)
             
-            print('^2[Haus-Manager KeyManager]^7 UI should now be visible!')
+            -- ESX FIX: Verify focus was set
+            Wait(50)
+            print('^2[Haus-Manager KeyManager]^7 NUI focus set - UI should be visible now!')
+            
+            -- ESX FIX: Send another message to ensure NUI received it
+            Wait(100)
+            SendNUIMessage({
+                action = 'ensureVisible',
+                ui = 'keyManagement'
+            })
         end)
     end, property.property_id)
 end
