@@ -65,13 +65,18 @@ end
 
 -- Open Menu (converts QB-Menu format to appropriate system)
 function Menu.Open(menuData)
+    print("^2[Haus-Manager Menu]^7 Menu.Open called, waiting for ready...")
     Menu.WaitForReady()
+    print("^2[Haus-Manager Menu]^7 Menu system ready, Type: " .. tostring(Menu.Type))
     
     if Menu.Type == 'qb-menu' then
+        print("^2[Haus-Manager Menu]^7 Opening QB-Menu...")
         -- QB-Menu format (already correct)
         exports['qb-menu']:openMenu(menuData)
+        print("^2[Haus-Manager Menu]^7 QB-Menu opened successfully")
         
     elseif Menu.Type == 'esx_context' then
+        print("^2[Haus-Manager Menu]^7 Opening ESX Context menu...")
         -- Convert to ESX Context format
         local elements = {}
         
@@ -87,7 +92,9 @@ function Menu.Open(menuData)
             end
         end
         
+        print("^2[Haus-Manager Menu]^7 Calling esx_context:Open with " .. #elements .. " elements")
         exports['esx_context']:Open('center', elements)
+        print("^2[Haus-Manager Menu]^7 ESX Context menu opened successfully")
         
     elseif Menu.Type == 'esx_menu_default' then
         -- ESX Menu Default doesn't support custom events in elements
@@ -155,38 +162,15 @@ function Menu.Open(menuData)
             end
             
             menu.close()
-            
-            -- CRITICAL FIX: Re-enable ox_target after menu closes
-            Citizen.SetTimeout(100, function()
-                if Target and Target.Type == 'ox_target' then
-                    print("^3[Haus-Manager]^7 Re-enabling ox_target after menu close")
-                    local success, err = pcall(function()
-                        exports.ox_target:disableTargeting(false)
-                    end)
-                    if not success then
-                        print("^1[Haus-Manager ERROR]^7 Failed to re-enable ox_target: " .. tostring(err))
-                    end
-                end
-            end)
         end, function(data, menu)
             print("^3[Haus-Manager Menu]^7 Menu cancelled")
             menu.close()
-            
-            -- CRITICAL FIX: Re-enable ox_target when menu is cancelled
-            Citizen.SetTimeout(100, function()
-                if Target and Target.Type == 'ox_target' then
-                    print("^3[Haus-Manager]^7 Re-enabling ox_target after menu cancel")
-                    local success, err = pcall(function()
-                        exports.ox_target:disableTargeting(false)
-                    end)
-                    if not success then
-                        print("^1[Haus-Manager ERROR]^7 Failed to re-enable ox_target: " .. tostring(err))
-                    end
-                end
-            end)
         end)
         
+        print("^2[Haus-Manager Menu]^7 ESX Menu Default opened successfully")
+        
     else
+        print("^2[Haus-Manager Menu]^7 Opening NUI fallback menu...")
         -- NUI Fallback - use built-in NUI system
         SendNUIMessage({
             action = "openMenu",

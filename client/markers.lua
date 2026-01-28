@@ -301,16 +301,7 @@ end
 
 -- Show property menu for owners
 function ShowPropertyMenu(property)
-    -- CRITICAL FIX: Disable ox_target before opening ESX menu to prevent input blocking
-    if Target and Target.Type == 'ox_target' then
-        print("^3[Haus-Manager]^7 Disabling ox_target before opening menu")
-        local success, err = pcall(function()
-            exports.ox_target:disableTargeting(true)
-        end)
-        if not success then
-            print("^1[Haus-Manager ERROR]^7 Failed to disable ox_target: " .. tostring(err))
-        end
-    end
+    print("^2[Haus-Manager]^7 ShowPropertyMenu called for: " .. property.property_name)
     
     local menu = {
         {
@@ -379,21 +370,14 @@ function ShowPropertyMenu(property)
         }
     })
     
+    print("^2[Haus-Manager]^7 Opening menu with " .. #menu .. " options")
     Menu.Open(menu)
+    print("^2[Haus-Manager]^7 Menu.Open() called successfully")
 end
 
 -- Show visitor menu (doorbell)
 function ShowVisitorMenu(property)
-    -- CRITICAL FIX: Disable ox_target before opening ESX menu to prevent input blocking
-    if Target and Target.Type == 'ox_target' then
-        print("^3[Haus-Manager]^7 Disabling ox_target before opening menu")
-        local success, err = pcall(function()
-            exports.ox_target:disableTargeting(true)
-        end)
-        if not success then
-            print("^1[Haus-Manager ERROR]^7 Failed to disable ox_target: " .. tostring(err))
-        end
-    end
+    print("^2[Haus-Manager]^7 ShowVisitorMenu called for: " .. property.property_name)
     
     local menu = {
         {
@@ -420,7 +404,9 @@ function ShowVisitorMenu(property)
         }
     }
     
+    print("^2[Haus-Manager]^7 Opening visitor menu with " .. #menu .. " options")
     Menu.Open(menu)
+    print("^2[Haus-Manager]^7 Menu.Open() called successfully")
 end
 
 
@@ -454,18 +440,6 @@ end)
 RegisterNetEvent('haus-manager:client:closeMenu', function()
     print("^3[Haus-Manager Events]^7 Close menu event triggered")
     Menu.Close()
-    
-    -- Re-enable ox_target if it was disabled
-    if Target and Target.Type == 'ox_target' then
-        Citizen.SetTimeout(100, function()
-            local success, err = pcall(function()
-                exports.ox_target:disableTargeting(false)
-            end)
-            if not success then
-                print("^1[Haus-Manager ERROR]^7 Failed to re-enable ox_target: " .. tostring(err))
-            end
-        end)
-    end
 end)
 
 -- Open sell menu event
