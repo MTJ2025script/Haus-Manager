@@ -230,8 +230,8 @@ function AddPropertyTargetZone(property, coords, zoneName)
     })
 end
 
--- Thread 3: Visual marker renderer (draws markers only, NO text labels)
--- Target zones handle all interactions now
+-- Thread 3: Visual marker renderer (draws markers AND property name labels)
+-- Property names are ALWAYS visible for navigation
 CreateThread(function()
     while true do
         Wait(0)
@@ -256,8 +256,14 @@ CreateThread(function()
             sleep = false
             DrawMarkerWithRadius(data.coords, Config.Markers, data.markerRadius)
             
-            -- NO 3D TEXT HERE - Target system handles interaction prompts now!
-            -- This prevents double display (marker + target prompt)
+            -- Draw property name label when close enough (ALWAYS visible for ESX!)
+            if distance < 15.0 then
+                local text = "🏠 " .. data.property.property_name
+                if data.property.owned == 1 then
+                    text = "🏠 " .. data.property.property_name .. " (Besetzt)"
+                end
+                DrawText3D(data.coords.x, data.coords.y, data.coords.z + 1.0, text)
+            end
         end
         
         if sleep then
