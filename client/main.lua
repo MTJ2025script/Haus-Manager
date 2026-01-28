@@ -345,11 +345,19 @@ function EnterProperty(property)
     
     print("^2[Haus-Manager EnterProperty]^7 Interior config found, type: " .. tostring(interiorType))
     
+    -- CRITICAL: Store current exterior position BEFORE teleporting
+    local ped = PlayerPedId()
+    local exteriorCoords = GetEntityCoords(ped)
+    print("^2[Haus-Manager EnterProperty]^7 Storing exterior coords: " .. exteriorCoords.x .. ", " .. exteriorCoords.y .. ", " .. exteriorCoords.z)
+    
+    -- Parse property coordinates to get heading
+    local propertyCoords = json.decode(property.coords)
+    local exteriorHeading = propertyCoords.heading or 0.0
+    
     -- Screen fade for smooth transition
     DoScreenFadeOut(500)
     
     -- Ensure player is not frozen before starting transition
-    local ped = PlayerPedId()
     FreezeEntityPosition(ped, false)
     SetPlayerControl(PlayerId(), true, 0)
     
@@ -392,6 +400,8 @@ function EnterProperty(property)
     
     isInProperty = true
     currentProperty = property
+    -- CRITICAL: Store exterior coords and heading for exit
+    currentProperty.storedExteriorCoords = vector4(exteriorCoords.x, exteriorCoords.y, exteriorCoords.z, exteriorHeading)
     
     Framework.Notify(Config.Notifications["entered_property"] or "Property betreten", 'success')
     print("^2[Haus-Manager EnterProperty]^7 Property entered successfully - player is now inside")
@@ -401,13 +411,39 @@ end
 function ExitProperty()
     if not isInProperty or not currentProperty then return end
     
-    -- Use QB-Interior to exit
-    TriggerEvent('qb-interior:client:exit')
+    print("^2[Haus-Manager ExitProperty]^7 Exiting property: " .. tostring(currentProperty.property_name))
+    
+    DoScreenFadeOut(500)
+    Wait(500)
+    
+    -- Teleport back to stored exterior coordinates
+    local ped = PlayerPedId()
+    if currentProperty.storedExteriorCoords then
+        local coords = currentProperty.storedExteriorCoords
+        print("^2[Haus-Manager ExitProperty]^7 Teleporting to stored exterior: " .. coords.x .. ", " .. coords.y .. ", " .. coords.z)
+        SetEntityCoords(ped, coords.x, coords.y, coords.z, false, false, false, true)
+        SetEntityHeading(ped, coords.w or 0.0)
+    else
+        -- Fallback: Use property marker coordinates
+        print("^3[Haus-Manager ExitProperty]^7 No stored coords, using property marker position")
+        local propertyCoords = json.decode(currentProperty.coords)
+        SetEntityCoords(ped, propertyCoords.x, propertyCoords.y, propertyCoords.z, false, false, false, true)
+        SetEntityHeading(ped, propertyCoords.heading or 0.0)
+    end
+    
+    -- Use QB-Interior exit if available
+    if GetResourceState('qb-interior') == 'started' then
+        TriggerEvent('qb-interior:client:exit')
+    end
+    
+    Wait(500)
+    DoScreenFadeIn(500)
     
     isInProperty = false
     currentProperty = nil
     
-    Framework.Notify(Config.Notifications["exited_property"], 'success')
+    Framework.Notify(Config.Notifications["exited_property"] or "Property verlassen", 'success')
+    print("^2[Haus-Manager ExitProperty]^7 Exit completed successfully")
 end
 
 -- Check if player owns or has key to property

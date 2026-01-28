@@ -152,14 +152,14 @@ function CreateInteriorExitMarker(spawnCoords)
             local distance = #(playerCoords - exitCoords)
             
             if distance <= 50.0 then
-                -- Draw exit marker (red for visibility) - ON THE GROUND
+                -- Draw exit marker (white/green for exit) - ON THE GROUND
                 DrawMarker(
                     1, -- Cylinder
                     exitCoords.x, exitCoords.y, exitCoords.z - 0.95, -- Just slightly below spawn point to be ON ground
                     0.0, 0.0, 0.0,
                     0.0, 0.0, 0.0,
                     1.2, 1.2, 0.8,
-                    255, 0, 0, 180,
+                    100, 255, 100, 180, -- Green color for exit (not red!)
                     false, false, 2, false, nil, nil, false
                 )
                 
