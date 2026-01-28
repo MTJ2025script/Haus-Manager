@@ -458,9 +458,12 @@ RegisterNetEvent('haus-manager:client:closeMenu', function()
     -- Re-enable ox_target if it was disabled
     if Target and Target.Type == 'ox_target' then
         Citizen.SetTimeout(100, function()
-            pcall(function()
+            local success, err = pcall(function()
                 exports.ox_target:disableTargeting(false)
             end)
+            if not success then
+                print("^1[Haus-Manager ERROR]^7 Failed to re-enable ox_target: " .. tostring(err))
+            end
         end)
     end
 end)

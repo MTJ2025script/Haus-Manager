@@ -86,25 +86,27 @@ Config.RentPeriods = {
 }
 
 -- QB-Interior Shells (predefined GTA Online style interiors)
+-- NOTE: Spawn coordinates may need adjustment based on your qb-interior configuration
+-- These are example coordinates - verify with your actual interior shells
 Config.Interiors = {
     -- Apartments
     ["ModernApartment"] = {
         label = "Moderne Wohnung",
         type = "apartment",
         shell = "ModernHotel", -- QB-Interior shell name
-        spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Proper apartment spawn point
+        spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Adjust based on actual shell spawn
     },
     ["ClassicApartment"] = {
         label = "Klassische Wohnung",
         type = "apartment",
         shell = "DelPerroHeights", -- QB-Interior shell name
-        spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Del Perro apartment spawn
+        spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Adjust based on actual shell spawn
     },
     ["LuxuryApartment"] = {
         label = "Luxus-Wohnung",
         type = "apartment",
         shell = "EclipseTowers", -- QB-Interior shell name
-        spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Eclipse Towers spawn
+        spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Adjust based on actual shell spawn
     },
     
     -- Houses
@@ -112,19 +114,19 @@ Config.Interiors = {
         label = "Standard-Haus",
         type = "house",
         shell = "FranklinHouse", -- QB-Interior shell name
-        spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Franklin house spawn
+        spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Adjust based on actual shell spawn
     },
     ["ModernHouse"] = {
         label = "Modernes Haus",
         type = "house",
         shell = "MichaelHouse", -- QB-Interior shell name
-        spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Michael house spawn
+        spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Adjust based on actual shell spawn
     },
     ["LuxuryHouse"] = {
         label = "Luxus-Haus",
         type = "house",
         shell = "TrevorHouse", -- QB-Interior shell name
-        spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Trevor house spawn
+        spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Adjust based on actual shell spawn
     },
     
     -- Offices
@@ -132,19 +134,19 @@ Config.Interiors = {
         label = "Kleines Büro",
         type = "office",
         shell = "OfficeLow", -- QB-Interior shell name
-        spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- Low-end office spawn
+        spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- Adjust based on actual shell spawn
     },
     ["MediumOffice"] = {
         label = "Mittleres Büro",
         type = "office",
         shell = "OfficeMid", -- QB-Interior shell name
-        spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- Mid-range office spawn
+        spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- Adjust based on actual shell spawn
     },
     ["LargeOffice"] = {
         label = "Großes Büro",
         type = "office",
         shell = "OfficeHigh", -- QB-Interior shell name
-        spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- High-end office spawn
+        spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- Adjust based on actual shell spawn
     }
 }
 
