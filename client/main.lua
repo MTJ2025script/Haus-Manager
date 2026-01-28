@@ -403,21 +403,21 @@ function EnterProperty(property)
     currentProperty.storedExteriorCoords = vector4(exteriorCoords.x, exteriorCoords.y, exteriorCoords.z, exteriorHeading)
     
     -- CRITICAL FIX: Trigger safe and wardrobe marker creation
-    print("^2[Haus-Manager EnterProperty]^7 Setting up interior markers (safe, wardrobe)")
+    print("^2[Haus-Manager EnterProperty]^7 Richte Innenraum-Marker ein (Safe, Garderobe)")
     TriggerEvent('haus-manager:client:setupInteriorMarkers', property)
     
-    Framework.Notify(Config.Notifications["entered_property"] or "Property betreten", 'success')
-    print("^2[Haus-Manager EnterProperty]^7 Property entered successfully - player is now inside")
+    Framework.Notify(Config.Notifications["entered_property"] or "Immobilie betreten", 'success')
+    print("^2[Haus-Manager EnterProperty]^7 Immobilie erfolgreich betreten - Spieler ist jetzt drinnen")
 end
 
 -- Exit property
 function ExitProperty()
     if not isInProperty or not currentProperty then return end
     
-    print("^2[Haus-Manager ExitProperty]^7 Exiting property: " .. tostring(currentProperty.property_name))
+    print("^2[Haus-Manager ExitProperty]^7 Verlasse Immobilie: " .. tostring(currentProperty.property_name))
     
     -- CRITICAL: Clean up safe and wardrobe markers BEFORE exit
-    print("^2[Haus-Manager ExitProperty]^7 Cleaning up interior markers")
+    print("^2[Haus-Manager ExitProperty]^7 Räume Innenraum-Marker auf")
     TriggerEvent('haus-manager:client:cleanupInteriorMarkers', currentProperty.property_id)
     
     DoScreenFadeOut(500)
@@ -427,12 +427,12 @@ function ExitProperty()
     local ped = PlayerPedId()
     if currentProperty.storedExteriorCoords then
         local coords = currentProperty.storedExteriorCoords
-        print("^2[Haus-Manager ExitProperty]^7 Teleporting to stored exterior: " .. coords.x .. ", " .. coords.y .. ", " .. coords.z)
+        print("^2[Haus-Manager ExitProperty]^7 Teleportiere zu gespeichertem Ausgang: " .. coords.x .. ", " .. coords.y .. ", " .. coords.z)
         SetEntityCoords(ped, coords.x, coords.y, coords.z, false, false, false, true)
         SetEntityHeading(ped, coords.w or 0.0)
     else
         -- Fallback: Use property marker coordinates
-        print("^3[Haus-Manager ExitProperty]^7 No stored coords, using property marker position")
+        print("^3[Haus-Manager ExitProperty]^7 Keine gespeicherten Koordinaten, verwende Marker-Position")
         local propertyCoords = json.decode(currentProperty.coords)
         SetEntityCoords(ped, propertyCoords.x, propertyCoords.y, propertyCoords.z, false, false, false, true)
         SetEntityHeading(ped, propertyCoords.heading or 0.0)
@@ -449,8 +449,8 @@ function ExitProperty()
     isInProperty = false
     currentProperty = nil
     
-    Framework.Notify(Config.Notifications["exited_property"] or "Property verlassen", 'success')
-    print("^2[Haus-Manager ExitProperty]^7 Exit completed successfully")
+    Framework.Notify(Config.Notifications["exited_property"] or "Immobilie verlassen", 'success')
+    print("^2[Haus-Manager ExitProperty]^7 Ausgang erfolgreich abgeschlossen")
 end
 
 -- Check if player owns or has key to property
