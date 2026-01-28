@@ -20,25 +20,27 @@ function Menu.Initialize()
         if success and Menu.IsReady then return end
     end
     
-    if GetResourceState('esx_context') == 'started' then
-        local success = pcall(function()
-            local test = exports['esx_context']
-            if test and test.Open then
-                Menu.Type = 'esx_context'
-                Menu.IsReady = true
-                print("^2[Haus-Manager Menu Bridge]^7 ESX Context erkannt")
-            end
-        end)
-        if success and Menu.IsReady then return end
-    end
-    
+    -- Check esx_menu_default FIRST (more reliable callback system)
     if GetResourceState('esx_menu_default') == 'started' then
         local success = pcall(function()
             local test = exports['esx_menu_default']
             if test then
                 Menu.Type = 'esx_menu_default'
                 Menu.IsReady = true
-                print("^2[Haus-Manager Menu Bridge]^7 ESX Menu Default erkannt")
+                print("^2[Haus-Manager Menu Bridge]^7 ESX Menu Default erkannt (preferred)")
+            end
+        end)
+        if success and Menu.IsReady then return end
+    end
+    
+    -- Check esx_context as fallback (onSelect callbacks may not work in some versions)
+    if GetResourceState('esx_context') == 'started' then
+        local success = pcall(function()
+            local test = exports['esx_context']
+            if test and test.Open then
+                Menu.Type = 'esx_context'
+                Menu.IsReady = true
+                print("^3[Haus-Manager Menu Bridge]^7 ESX Context erkannt (fallback, may have issues)")
             end
         end)
         if success and Menu.IsReady then return end
