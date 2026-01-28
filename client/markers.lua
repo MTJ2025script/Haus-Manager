@@ -115,18 +115,27 @@ end)
 
 -- Event: Properties updated - refresh cached properties immediately after purchase/changes
 RegisterNetEvent('haus-manager:client:updateProperties', function(updatedProperties)
+    print(string.format("^2[Haus-Manager Markers]^7 Received property update: %d properties", updatedProperties and #updatedProperties or 0))
+    
+    -- CRITICAL: Remove ALL existing target zones before update
+    for zoneName, _ in pairs(activeTargetZones) do
+        print(string.format("^3[Haus-Manager Markers]^7 Removing old target zone: %s", zoneName))
+        Target.RemoveZone(zoneName)
+        activeTargetZones[zoneName] = nil
+    end
+    
     -- Update cached properties so interactions use fresh data
     cachedProperties = updatedProperties or {}
     
     -- Force immediate refresh of nearby properties
     lastPropertyUpdate = 0
     
-    print(string.format("^2[Haus-Manager Markers]^7 Cached properties updated: %d properties", #cachedProperties))
+    print(string.format("^2[Haus-Manager Markers]^7 Properties updated, zones cleared. Will recreate zones for %d properties", #cachedProperties))
     
     if Config.Debug then
         for _, prop in ipairs(cachedProperties) do
-            print(string.format("^3[Haus-Manager Markers Debug]^7 Cached property: %s, owned: %s, owner: %s", 
-                prop.property_name, tostring(prop.owned), tostring(prop.owner_identifier)))
+            print(string.format("^3[Haus-Manager Markers Debug]^7 Property: %s (ID: %s), visible: %s, owned: %s", 
+                prop.property_name, prop.property_id, tostring(prop.marker_visible), tostring(prop.owned)))
         end
     end
 end)
