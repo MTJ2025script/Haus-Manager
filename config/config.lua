@@ -88,18 +88,26 @@ Config.RentPeriods = {
 -- QB-Interior Shells (predefined GTA Online style interiors)
 -- NOTE: Spawn coordinates may need adjustment based on your qb-interior configuration
 -- These are example coordinates - verify with your actual interior shells
+--
+-- WICHTIG: Manche Shells haben fest integrierte grüne Exit-Marker als Teil des IPL/Models!
+-- Falls Sie einen grünen Marker sehen der nicht entfernt werden kann, probieren Sie ein anderes Shell.
+-- Empfohlene Shells OHNE fest integrierte Marker:
+--   - Apartments: "ModernHotel", "DelPerroHeights" 
+--   - Häuser: "FranklinHouse", "MichaelHouse"
+--   - Büros: "OfficeStandard" (falls verfügbar statt "OfficeLow")
+--
 Config.Interiors = {
     -- Apartments
     ["ModernApartment"] = {
         label = "Moderne Wohnung",
         type = "apartment",
-        shell = "ModernHotel", -- QB-Interior Shell-Name
+        shell = "ModernHotel", -- QB-Interior Shell-Name (KEIN fest integrierter Marker)
         spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Anpassen basierend auf tatsächlichem Shell-Spawn
     },
     ["ClassicApartment"] = {
         label = "Klassische Wohnung",
         type = "apartment",
-        shell = "DelPerroHeights", -- QB-Interior Shell-Name
+        shell = "DelPerroHeights", -- QB-Interior Shell-Name (KEIN fest integrierter Marker)
         spawn = vector4(-782.41, 318.45, 217.67, 355.45) -- Anpassen basierend auf tatsächlichem Shell-Spawn
     },
     ["LuxuryApartment"] = {
@@ -113,13 +121,13 @@ Config.Interiors = {
     ["StandardHouse"] = {
         label = "Standard-Haus",
         type = "house",
-        shell = "FranklinHouse", -- QB-Interior Shell-Name
+        shell = "FranklinHouse", -- QB-Interior Shell-Name (KEIN fest integrierter Marker)
         spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Anpassen basierend auf tatsächlichem Shell-Spawn
     },
     ["ModernHouse"] = {
         label = "Modernes Haus",
         type = "house",
-        shell = "MichaelHouse", -- QB-Interior Shell-Name
+        shell = "MichaelHouse", -- QB-Interior Shell-Name (KEIN fest integrierter Marker)
         spawn = vector4(-174.35, 497.5, 137.65, 180.0) -- Anpassen basierend auf tatsächlichem Shell-Spawn
     },
     ["LuxuryHouse"] = {
@@ -133,8 +141,9 @@ Config.Interiors = {
     ["SmallOffice"] = {
         label = "Kleines Büro",
         type = "office",
-        shell = "OfficeLow", -- QB-Interior Shell-Name
+        shell = "OfficeLow", -- QB-Interior Shell-Name (WARNUNG: Hat möglicherweise integrierten grünen Marker!)
         spawn = vector4(-141.0, -620.0, 168.82, 90.0) -- Anpassen basierend auf tatsächlichem Shell-Spawn
+        -- ALTERNATIVE: Ändern Sie shell zu einem anderen Büro-Shell ohne integrierten Marker
     },
     ["MediumOffice"] = {
         label = "Mittleres Büro",
