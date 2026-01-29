@@ -151,30 +151,30 @@ Config.Interiors = {
     },
     
     -- BÜROS (Isolierte Interior-Shells - vermeiden Konflikte mit anderen Scripts)
-    -- Diese verwenden qb-interior Shells - funktionieren mit beiden Frameworks
+    -- WICHTIG: Diese Shells haben KEINE fest integrierten grünen Exit-Marker
     ["SmallOffice"] = {
         label = "Kleines Büro",
         type = "office",
-        shell = "OfficeLow",  -- qb-interior Shell (funktioniert mit QB-Core UND ESX wenn qb-interior installiert)
-        spawn = vector4(-1005.0, -481.0, 50.03, 28.0), -- Small Office Interior (isoliert)
-        safe_coords = vector4(-1007.5, -474.0, 50.03, 180.0),
-        wardrobe_coords = vector4(-1005.0, -476.5, 50.03, 270.0)
+        shell = "ClassicHouse",  -- Alternative Shell ohne grünen Marker
+        spawn = vector4(346.5, -1013.0, -99.2, 0.0), -- Small Office Interior (isoliert, kein grüner Marker)
+        safe_coords = vector4(351.0, -1008.0, -99.2, 180.0),
+        wardrobe_coords = vector4(348.0, -1011.0, -99.2, 270.0)
     },
     ["MediumOffice"] = {
         label = "Mittleres Büro",
         type = "office",
-        shell = "OfficeMid",  -- qb-interior Shell
-        spawn = vector4(-1579.76, -565.11, 108.52, 220.0), -- Medium Office Interior (isoliert)
-        safe_coords = vector4(-1575.0, -560.0, 108.52, 180.0),
-        wardrobe_coords = vector4(-1577.0, -563.0, 108.52, 270.0)
+        shell = "RanchHouse",  -- Alternative Shell ohne grünen Marker
+        spawn = vector4(1972.0, 3816.0, 33.5, 0.0), -- Medium Office Interior (isoliert, kein grüner Marker)
+        safe_coords = vector4(1977.0, 3821.0, 33.5, 180.0),
+        wardrobe_coords = vector4(1974.0, 3818.0, 33.5, 270.0)
     },
     ["LargeOffice"] = {
         label = "Großes Büro",
         type = "office",
-        shell = "OfficeHigh",  -- qb-interior Shell
-        spawn = vector4(-141.0, -620.0, 168.82, 90.0), -- Large Office Interior (isoliert)
-        safe_coords = vector4(-136.89, -631.19, 168.82, 180.0),
-        wardrobe_coords = vector4(-139.0, -625.0, 168.82, 270.0)
+        shell = "ModernHouse2",  -- Alternative Shell ohne grünen Marker
+        spawn = vector4(-1453.0, -540.0, 34.7, 0.0), -- Large Office Interior (isoliert, kein grüner Marker)
+        safe_coords = vector4(-1448.0, -535.0, 34.7, 180.0),
+        wardrobe_coords = vector4(-1451.0, -538.0, 34.7, 270.0)
     }
 }
 
