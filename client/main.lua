@@ -397,10 +397,9 @@ function EnterProperty(property)
         print("^3[Haus-Manager EnterProperty]^7 qb-interior not available (ESX mode or not installed)")
     end
     
-    -- CRITICAL FIX: Remove built-in green exit markers from shell
-    -- Some qb-interior shells have integrated green markers that we need to hide
-    Wait(1000) -- Wait for shell to fully load
-    RemoveBuiltInShellMarkers()
+    -- Note: Some interior shells may have built-in markers
+    -- Our red marker is the functional exit point
+    -- Built-in shell markers (if present) are part of shell design and cannot be removed via code
     
     isInProperty = true
     currentProperty = property
@@ -417,69 +416,6 @@ function EnterProperty(property)
     
     Framework.Notify(Config.Notifications["entered_property"] or "Immobilie betreten", 'success')
     print("^2[Haus-Manager EnterProperty]^7 Immobilie erfolgreich betreten - Spieler ist jetzt drinnen")
-end
-
--- Remove built-in shell markers (like green exit markers in some qb-interior shells)
-function RemoveBuiltInShellMarkers()
-    local ped = PlayerPedId()
-    local coords = GetEntityCoords(ped)
-    
-    print("^3[Haus-Manager Shell Cleanup]^7 Searching for built-in props/markers to remove...")
-    
-    -- Common prop models used for exit markers in shells
-    local markerModels = {
-        `prop_offroad_tyres02`, -- Sometimes used for markers
-        `prop_mp_cone_01`,      -- Traffic cone (sometimes used)
-        `prop_mp_cone_02`,
-        `prop_mp_cone_03`,
-        `prop_mp_cone_04`,
-        -- Add more if you identify specific props
-    }
-    
-    -- Search for props in a radius around spawn
-    local propsRemoved = 0
-    for _, modelHash in ipairs(markerModels) do
-        local obj = GetClosestObjectOfType(coords.x, coords.y, coords.z, 50.0, modelHash, false, false, false)
-        if obj ~= 0 and DoesEntityExist(obj) then
-            print("^2[Haus-Manager Shell Cleanup]^7 Found and removing prop: " .. modelHash)
-            DeleteObject(obj)
-            propsRemoved = propsRemoved + 1
-        end
-    end
-    
-    -- Also try to find any objects with specific colors (green markers)
-    -- Note: This is limited by FiveM natives but we can try
-    local allObjects = GetGamePool('CObject')
-    for _, obj in ipairs(allObjects) do
-        if DoesEntityExist(obj) then
-            local objCoords = GetEntityCoords(obj)
-            local distance = #(vector3(coords.x, coords.y, coords.z) - objCoords)
-            
-            -- If object is close to spawn point (likely interior decoration/marker)
-            if distance < 20.0 then
-                local model = GetEntityModel(obj)
-                -- Check if it's a marker-like object (cylinder, cone, etc)
-                -- This is a heuristic - adjust based on what you find in your shell
-                local modelName = GetEntityArchetypeName(obj)
-                if modelName and (
-                    string.find(string.lower(modelName), "marker") or
-                    string.find(string.lower(modelName), "cone") or
-                    string.find(string.lower(modelName), "cylinder")
-                ) then
-                    print("^2[Haus-Manager Shell Cleanup]^7 Found potential marker object: " .. modelName .. " at distance " .. distance)
-                    DeleteObject(obj)
-                    propsRemoved = propsRemoved + 1
-                end
-            end
-        end
-    end
-    
-    if propsRemoved > 0 then
-        print("^2[Haus-Manager Shell Cleanup]^7 Removed " .. propsRemoved .. " built-in prop(s)")
-    else
-        print("^3[Haus-Manager Shell Cleanup]^7 No built-in props found (or shell doesn't have removable markers)")
-        print("^3[Haus-Manager Shell Cleanup]^7 Note: Some shells have baked-in markers that can't be removed via code")
-    end
 end
 
 -- Create exit marker inside property
