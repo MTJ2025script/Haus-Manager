@@ -20,25 +20,27 @@ function Menu.Initialize()
         if success and Menu.IsReady then return end
     end
     
-    if GetResourceState('esx_context') == 'started' then
-        local success = pcall(function()
-            local test = exports['esx_context']
-            if test and test.Open then
-                Menu.Type = 'esx_context'
-                Menu.IsReady = true
-                print("^2[Haus-Manager Menu Bridge]^7 ESX Context erkannt")
-            end
-        end)
-        if success and Menu.IsReady then return end
-    end
-    
+    -- Check esx_menu_default FIRST (more reliable callback system)
     if GetResourceState('esx_menu_default') == 'started' then
         local success = pcall(function()
             local test = exports['esx_menu_default']
             if test then
                 Menu.Type = 'esx_menu_default'
                 Menu.IsReady = true
-                print("^2[Haus-Manager Menu Bridge]^7 ESX Menu Default erkannt")
+                print("^2[Haus-Manager Menu Bridge]^7 ESX Menu Default erkannt (preferred)")
+            end
+        end)
+        if success and Menu.IsReady then return end
+    end
+    
+    -- Check esx_context as fallback (onSelect callbacks may not work in some versions)
+    if GetResourceState('esx_context') == 'started' then
+        local success = pcall(function()
+            local test = exports['esx_context']
+            if test and test.Open then
+                Menu.Type = 'esx_context'
+                Menu.IsReady = true
+                print("^3[Haus-Manager Menu Bridge]^7 ESX Context erkannt (fallback, may have issues)")
             end
         end)
         if success and Menu.IsReady then return end
@@ -65,33 +67,80 @@ end
 
 -- Open Menu (converts QB-Menu format to appropriate system)
 function Menu.Open(menuData)
+    print("^2[Haus-Manager Menu]^7 Menu.Open called, waiting for ready...")
     Menu.WaitForReady()
+    print("^2[Haus-Manager Menu]^7 Menu system ready, Type: " .. tostring(Menu.Type))
     
     if Menu.Type == 'qb-menu' then
+        print("^2[Haus-Manager Menu]^7 Opening QB-Menu...")
         -- QB-Menu format (already correct)
         exports['qb-menu']:openMenu(menuData)
+        print("^2[Haus-Manager Menu]^7 QB-Menu opened successfully")
         
     elseif Menu.Type == 'esx_context' then
+        print("^2[Haus-Manager Menu]^7 Opening ESX Context menu...")
         -- Convert to ESX Context format
         local elements = {}
         
-        for _, item in ipairs(menuData) do
+        for i, item in ipairs(menuData) do
             if not item.isMenuHeader then
-                table.insert(elements, {
+                print("^3[Haus-Manager Menu Debug]^7 Processing menu item " .. i .. ": " .. tostring(item.header))
+                
+                -- ESX Context braucht einen onSelect callback
+                local menuOption = {
                     title = item.header or item.txt,
-                    description = item.txt,
-                    event = item.params and item.params.event,
-                    args = item.params and item.params.args,
-                    server = item.params and item.params.isServer or false
-                })
+                    description = item.txt
+                }
+                
+                -- Wenn es ein Event gibt, füge onSelect hinzu
+                if item.params and item.params.event then
+                    print("^3[Haus-Manager Menu Debug]^7 Item has event: " .. item.params.event)
+                    
+                    menuOption.onSelect = function()
+                        print("^2[Haus-Manager Menu]^7 ESX Context option selected: " .. (item.header or "unknown"))
+                        print("^2[Haus-Manager Menu]^7 Event: " .. item.params.event)
+                        print("^2[Haus-Manager Menu]^7 Args type: " .. type(item.params.args))
+                        
+                        -- Event auslösen
+                        if item.params.isServer then
+                            print("^2[Haus-Manager Menu]^7 Triggering server event: " .. item.params.event)
+                            TriggerServerEvent(item.params.event, item.params.args)
+                        else
+                            print("^2[Haus-Manager Menu]^7 Triggering client event: " .. item.params.event)
+                            TriggerEvent(item.params.event, item.params.args)
+                        end
+                        
+                        -- Menü nach Event schließen (wichtig für ESX!)
+                        print("^2[Haus-Manager Menu]^7 Closing ESX Context menu")
+                        exports['esx_context']:Close()
+                    end
+                else
+                    print("^1[Haus-Manager Menu ERROR]^7 Item has NO event!")
+                end
+                
+                table.insert(elements, menuOption)
             end
         end
         
+        print("^2[Haus-Manager Menu]^7 Calling esx_context:Open with " .. #elements .. " elements")
+        for i, elem in ipairs(elements) do
+            print("^3[Haus-Manager Menu Debug]^7 Element " .. i .. ": " .. tostring(elem.title) .. " has onSelect: " .. tostring(elem.onSelect ~= nil))
+        end
+        
         exports['esx_context']:Open('center', elements)
+        print("^2[Haus-Manager Menu]^7 ESX Context menu opened successfully")
         
     elseif Menu.Type == 'esx_menu_default' then
         -- ESX Menu Default doesn't support custom events in elements
         -- We need to handle this differently - trigger events directly without using ESX's event system
+        
+        -- Stelle sicher, dass ESX verfügbar ist
+        if not Framework or not Framework.Object then
+            print("^1[Haus-Manager Menu ERROR]^7 ESX Framework object not available!")
+            return
+        end
+        
+        local ESX = Framework.Object
         local elements = {}
         local eventMap = {} -- Map value to event data
         
@@ -114,7 +163,7 @@ function Menu.Open(menuData)
             end
         end
         
-        print("^3[Haus-Manager Menu]^7 Opening ESX menu with " .. #elements .. " options")
+        print("^2[Haus-Manager Menu]^7 Opening ESX Menu Default with " .. #elements .. " options")
         print("^3[Haus-Manager Menu Debug]^7 ESX object exists: " .. tostring(ESX ~= nil))
         print("^3[Haus-Manager Menu Debug]^7 ESX.UI exists: " .. tostring(ESX and ESX.UI ~= nil))
         print("^3[Haus-Manager Menu Debug]^7 ESX.UI.Menu exists: " .. tostring(ESX and ESX.UI and ESX.UI.Menu ~= nil))
@@ -155,38 +204,15 @@ function Menu.Open(menuData)
             end
             
             menu.close()
-            
-            -- CRITICAL FIX: Re-enable ox_target after menu closes
-            Citizen.SetTimeout(100, function()
-                if Target and Target.Type == 'ox_target' then
-                    print("^3[Haus-Manager]^7 Re-enabling ox_target after menu close")
-                    local success, err = pcall(function()
-                        exports.ox_target:disableTargeting(false)
-                    end)
-                    if not success then
-                        print("^1[Haus-Manager ERROR]^7 Failed to re-enable ox_target: " .. tostring(err))
-                    end
-                end
-            end)
         end, function(data, menu)
             print("^3[Haus-Manager Menu]^7 Menu cancelled")
             menu.close()
-            
-            -- CRITICAL FIX: Re-enable ox_target when menu is cancelled
-            Citizen.SetTimeout(100, function()
-                if Target and Target.Type == 'ox_target' then
-                    print("^3[Haus-Manager]^7 Re-enabling ox_target after menu cancel")
-                    local success, err = pcall(function()
-                        exports.ox_target:disableTargeting(false)
-                    end)
-                    if not success then
-                        print("^1[Haus-Manager ERROR]^7 Failed to re-enable ox_target: " .. tostring(err))
-                    end
-                end
-            end)
         end)
         
+        print("^2[Haus-Manager Menu]^7 ESX Menu Default opened successfully")
+        
     else
+        print("^2[Haus-Manager Menu]^7 Opening NUI fallback menu...")
         -- NUI Fallback - use built-in NUI system
         SendNUIMessage({
             action = "openMenu",
@@ -198,17 +224,25 @@ end
 
 -- Close Menu
 function Menu.Close()
+    print("^2[Haus-Manager Menu]^7 Menu.Close() called, Type: " .. tostring(Menu.Type))
+    
     if Menu.Type == 'qb-menu' then
         TriggerEvent('qb-menu:client:closeMenu')
+        print("^2[Haus-Manager Menu]^7 QB-Menu close event triggered")
     elseif Menu.Type == 'esx_context' then
         exports['esx_context']:Close()
+        print("^2[Haus-Manager Menu]^7 ESX Context closed")
     elseif Menu.Type == 'esx_menu_default' then
-        ESX.UI.Menu.CloseAll()
+        if Framework and Framework.Object then
+            Framework.Object.UI.Menu.CloseAll()
+            print("^2[Haus-Manager Menu]^7 ESX Menu Default closed")
+        end
     else
         SendNUIMessage({
             action = "closeMenu"
         })
         SetNuiFocus(false, false)
+        print("^2[Haus-Manager Menu]^7 NUI menu closed")
     end
 end
 

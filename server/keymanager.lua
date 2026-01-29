@@ -245,16 +245,31 @@ CreateThread(function()
     -- Enrich with player information
     local enrichedKeys = {}
     for _, key in ipairs(keys) do
-        local holderData = MySQL.query.await(
-            'SELECT charinfo FROM players WHERE citizenid = ?', 
-            {key.citizen_id}
-        )
-        
         local holderName = 'Unbekannt'
-        if holderData and holderData[1] then
-            local charinfo = json.decode(holderData[1].charinfo)
-            if charinfo then
-                holderName = charinfo.firstname .. ' ' .. charinfo.lastname
+        
+        -- ESX vs QB-Core player name query
+        if FrameworkServer.Type == 'esx' then
+            -- ESX: users table with identifier
+            local holderData = MySQL.query.await(
+                'SELECT firstname, lastname FROM users WHERE identifier = ?', 
+                {key.citizen_id}
+            )
+            
+            if holderData and holderData[1] then
+                holderName = (holderData[1].firstname or '') .. ' ' .. (holderData[1].lastname or '')
+            end
+        else
+            -- QB-Core: players table with citizenid
+            local holderData = MySQL.query.await(
+                'SELECT charinfo FROM players WHERE citizenid = ?', 
+                {key.citizen_id}
+            )
+            
+            if holderData and holderData[1] then
+                local charinfo = json.decode(holderData[1].charinfo)
+                if charinfo then
+                    holderName = charinfo.firstname .. ' ' .. charinfo.lastname
+                end
             end
         end
         

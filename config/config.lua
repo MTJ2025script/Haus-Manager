@@ -1,48 +1,48 @@
 Config = {}
 
--- Framework Settings (QB-Core oder ESX werden automatisch erkannt)
+-- Framework-Einstellungen (QB-Core oder ESX werden automatisch erkannt)
 Config.Framework = "auto-detect" -- Automatische Erkennung (kann auch manuell auf "qb-core" oder "esx" gesetzt werden)
-Config.UseQBInterior = true -- Use qb-interior natives (no custom shells)
+Config.UseQBInterior = true -- QB-Interior natives verwenden (keine custom shells)
 
--- Marker Settings
+-- Marker-Einstellungen
 Config.Markers = {
-    Enabled = true, -- Toggle marker visibility globally
-    Type = 1, -- Marker type (1 = cylinder)
-    Size = { x = 0.8, y = 0.8, z = 0.5 }, -- Smaller, less visible
-    Color = { r = 255, g = 255, b = 255 }, -- White color
-    Alpha = 100, -- More transparent
+    Enabled = true, -- Marker-Sichtbarkeit global ein/aus
+    Type = 1, -- Marker-Typ (1 = Zylinder)
+    Size = { x = 0.8, y = 0.8, z = 0.5 }, -- Kleiner, weniger sichtbar
+    Color = { r = 255, g = 255, b = 255 }, -- Weiße Farbe
+    Alpha = 100, -- Transparenter
     BobUpAndDown = false,
     FaceCamera = false,
     Rotate = false,
-    DrawDistance = 50.0, -- Default visibility distance
-    InteractionDistance = 2.5, -- Distance to interact
-    ShowRadius = false, -- Hide radius ring for cleaner look
+    DrawDistance = 50.0, -- Standard-Sichtweite
+    InteractionDistance = 2.5, -- Distanz für Interaktion
+    ShowRadius = false, -- Radius-Ring ausblenden für sauberen Look
     RadiusColor = { r = 255, g = 255, b = 255, a = 30 }
 }
 
--- Property Types
+-- Immobilientypen
 Config.PropertyTypes = {
     apartment = {
         label = "Wohnung",
         maxKeys = 2,
-        garageSize = "small", -- 3 parking spaces
+        garageSize = "small", -- 3 Parkplätze
         icon = "apartment"
     },
     house = {
         label = "Haus",
         maxKeys = 5,
-        garageSize = "medium", -- 6 parking spaces
+        garageSize = "medium", -- 6 Parkplätze
         icon = "home"
     },
     office = {
         label = "Büro",
         maxKeys = 15,
-        garageSize = "large", -- 16 parking spaces
+        garageSize = "large", -- 16 Parkplätze
         icon = "business"
     }
 }
 
--- Garage Sizes
+-- Garagen-Größen
 Config.GarageSizes = {
     small = {
         label = "Klein",
@@ -86,79 +86,109 @@ Config.RentPeriods = {
 }
 
 -- QB-Interior Shells (predefined GTA Online style interiors)
+-- NOTE: Spawn coordinates may need adjustment based on your qb-interior configuration
+-- These are example coordinates - verify with your actual interior shells
+--
+-- WICHTIG: Manche Shells haben fest integrierte grüne Exit-Marker als Teil des IPL/Models!
+-- Falls Sie einen grünen Marker sehen der nicht entfernt werden kann, probieren Sie ein anderes Shell.
+-- Empfohlene Shells OHNE fest integrierte Marker:
+--   - Apartments: "ModernHotel", "DelPerroHeights" 
+--   - Häuser: "FranklinHouse", "MichaelHouse"
+--   - Büros: "OfficeStandard" (falls verfügbar statt "OfficeLow")
+--
 Config.Interiors = {
-    -- Apartments
+    -- APARTMENTS (Isolierte Interior-Shells - vermeiden Konflikte mit anderen Scripts)
+    -- Diese Koordinaten sind INTERIOR-RÄUME, nicht normale Welt-Locations
     ["ModernApartment"] = {
         label = "Moderne Wohnung",
         type = "apartment",
-        shell = "ModernHotel", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0) -- Relative spawn point inside
+        shell = "ModernHotel",
+        spawn = vector4(266.06, -1007.43, -101.01, 0.0), -- Modern Apartment Interior (isoliert)
+        safe_coords = vector4(260.0, -1003.0, -99.0, 90.0),
+        wardrobe_coords = vector4(263.0, -1000.5, -99.0, 180.0)
     },
     ["ClassicApartment"] = {
         label = "Klassische Wohnung",
         type = "apartment",
-        shell = "DelPerroHeights", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        shell = "DelPerroHeights",
+        spawn = vector4(151.48, -1007.9, -99.0, 0.0), -- Classic Apartment Interior (isoliert)
+        safe_coords = vector4(145.0, -1004.0, -99.0, 90.0),
+        wardrobe_coords = vector4(148.0, -1001.0, -99.0, 180.0)
     },
     ["LuxuryApartment"] = {
         label = "Luxus-Wohnung",
         type = "apartment",
-        shell = "EclipseTowers", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        shell = "EclipseTowers",
+        spawn = vector4(-773.2, 341.8, 211.4, 180.0), -- Luxury Apartment Interior (isoliert)
+        safe_coords = vector4(-778.0, 337.0, 211.4, 90.0),
+        wardrobe_coords = vector4(-775.0, 339.0, 211.4, 180.0)
     },
     
-    -- Houses
+    -- HÄUSER (Isolierte Interior-Shells - vermeiden Konflikte mit anderen Scripts)
     ["StandardHouse"] = {
         label = "Standard-Haus",
         type = "house",
-        shell = "FranklinHouse", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        shell = "FranklinHouse",
+        spawn = vector4(7.93, 539.5, 176.03, 340.0), -- Standard House Interior (isoliert)
+        safe_coords = vector4(12.0, 543.0, 176.03, 270.0),
+        wardrobe_coords = vector4(9.0, 541.0, 176.03, 0.0)
     },
     ["ModernHouse"] = {
         label = "Modernes Haus",
         type = "house",
-        shell = "MichaelHouse", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        shell = "MichaelHouse",
+        spawn = vector4(-174.35, 497.5, 137.67, 180.0), -- Modern House Interior (isoliert)
+        safe_coords = vector4(-169.0, 493.0, 137.67, 270.0),
+        wardrobe_coords = vector4(-171.0, 496.0, 137.67, 0.0)
     },
     ["LuxuryHouse"] = {
         label = "Luxus-Haus",
         type = "house",
-        shell = "TrevorHouse", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        shell = "TrevorHouse",
+        spawn = vector4(-1150.7, -1520.7, 10.63, 125.0), -- Luxury House Interior (isoliert)
+        safe_coords = vector4(-1146.0, -1517.0, 10.63, 270.0),
+        wardrobe_coords = vector4(-1148.0, -1519.0, 10.63, 0.0)
     },
     
-    -- Offices
+    -- BÜROS (Isolierte Interior-Shells - vermeiden Konflikte mit anderen Scripts)
+    -- WICHTIG: Diese Shells haben KEINE fest integrierten grünen Exit-Marker
     ["SmallOffice"] = {
         label = "Kleines Büro",
         type = "office",
-        shell = "OfficeLow", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        shell = "ClassicHouse",  -- Alternative Shell ohne grünen Marker
+        spawn = vector4(346.5, -1013.0, -99.2, 0.0), -- Small Office Interior (isoliert, kein grüner Marker)
+        safe_coords = vector4(351.0, -1008.0, -99.2, 180.0),
+        wardrobe_coords = vector4(348.0, -1011.0, -99.2, 270.0)
     },
     ["MediumOffice"] = {
         label = "Mittleres Büro",
         type = "office",
-        shell = "OfficeMid", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        shell = "RanchHouse",  -- Alternative Shell ohne grünen Marker
+        spawn = vector4(1972.0, 3816.0, 33.5, 0.0), -- Medium Office Interior (isoliert, kein grüner Marker)
+        safe_coords = vector4(1977.0, 3821.0, 33.5, 180.0),
+        wardrobe_coords = vector4(1974.0, 3818.0, 33.5, 270.0)
     },
     ["LargeOffice"] = {
         label = "Großes Büro",
         type = "office",
-        shell = "OfficeHigh", -- QB-Interior shell name
-        spawn = vector4(0.0, 0.0, 0.0, 0.0)
+        shell = "ModernHouse2",  -- Alternative Shell ohne grünen Marker
+        spawn = vector4(-1453.0, -540.0, 34.7, 0.0), -- Large Office Interior (isoliert, kein grüner Marker)
+        safe_coords = vector4(-1448.0, -535.0, 34.7, 180.0),
+        wardrobe_coords = vector4(-1451.0, -538.0, 34.7, 270.0)
     }
 }
 
--- Default Property Prices
+-- Standard-Immobilienpreise
 Config.DefaultPrices = {
     apartment = 50000,
     house = 150000,
     office = 250000
 }
 
--- Admin Permission (only owner can set properties)
-Config.AdminGroup = "admin" -- QB-Core permission group
+-- Admin-Berechtigung (nur Besitzer kann Immobilien setzen)
+Config.AdminGroup = "admin" -- QB-Core Berechtigungsgruppe
 
--- Super Admins (Server Owner / License Holder)
+-- Super-Admins (Server-Besitzer / Lizenzinhaber)
 -- Diese Spieler haben IMMER Admin-Rechte, unabhängig von Framework-Gruppen
 -- Format: Identifier des Spielers (steam:, license:, discord:, etc.)
 Config.SuperAdmins = {
@@ -168,18 +198,18 @@ Config.SuperAdmins = {
     -- "discord:123456789012345678",
 }
 
--- License System
+-- Lizenz-System
 -- WICHTIG: Setzen Sie hier Ihre persönliche Lizenz ein!
 -- Diese Datei NICHT auf GitHub hochladen!
 Config.License = "" -- Ihre Admin Lizenz-Key hier eintragen
 
--- Debug Mode
+-- Debug-Modus
 Config.Debug = false
 
--- Language
-Config.Locale = "de" -- German
+-- Sprache
+Config.Locale = "de" -- Deutsch
 
--- Notifications
+-- Benachrichtigungen
 Config.Notifications = {
     ["property_purchased"] = "Sie haben die Immobilie erfolgreich gekauft!",
     ["property_rented"] = "Sie haben die Immobilie erfolgreich gemietet!",

@@ -147,16 +147,24 @@ end
 
 -- Show Notification
 function Framework.Notify(message, type, duration)
-    if not Framework.Type or not Framework.Object then
-        print("^1[Haus-Manager Bridge]^7 Framework nicht initialisiert!")
-        return
-    end
+    duration = duration or 5000
     
-    if Framework.Type == 'qb-core' then
-        Framework.Object.Functions.Notify(message, type, duration)
-    elseif Framework.Type == 'esx' then
-        local notifType = ESX_NOTIFICATION_TYPES[type] or 'info'
-        Framework.Object.ShowNotification(message, notifType, duration)
+    -- Use custom NUI notification system (zentral, schön, mit Icons)
+    SendNUIMessage({
+        action = 'showNotification',
+        message = message,
+        type = type or 'info',
+        duration = duration
+    })
+    
+    -- Fallback: Also use framework notification for compatibility
+    if Framework.Type == 'qb-core' and Framework.Object then
+        -- QB-Core notification als Backup
+        -- Framework.Object.Functions.Notify(message, type, duration)
+    elseif Framework.Type == 'esx' and Framework.Object then
+        -- ESX notification als Backup
+        -- local notifType = ESX_NOTIFICATION_TYPES[type] or 'info'
+        -- Framework.Object.ShowNotification(message, notifType, duration)
     end
 end
 

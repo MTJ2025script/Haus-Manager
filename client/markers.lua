@@ -115,18 +115,27 @@ end)
 
 -- Event: Properties updated - refresh cached properties immediately after purchase/changes
 RegisterNetEvent('haus-manager:client:updateProperties', function(updatedProperties)
+    print(string.format("^2[Haus-Manager Markers]^7 Received property update: %d properties", updatedProperties and #updatedProperties or 0))
+    
+    -- CRITICAL: Remove ALL existing target zones before update
+    for zoneName, _ in pairs(activeTargetZones) do
+        print(string.format("^3[Haus-Manager Markers]^7 Removing old target zone: %s", zoneName))
+        Target.RemoveZone(zoneName)
+        activeTargetZones[zoneName] = nil
+    end
+    
     -- Update cached properties so interactions use fresh data
     cachedProperties = updatedProperties or {}
     
     -- Force immediate refresh of nearby properties
     lastPropertyUpdate = 0
     
-    print(string.format("^2[Haus-Manager Markers]^7 Cached properties updated: %d properties", #cachedProperties))
+    print(string.format("^2[Haus-Manager Markers]^7 Properties updated, zones cleared. Will recreate zones for %d properties", #cachedProperties))
     
     if Config.Debug then
         for _, prop in ipairs(cachedProperties) do
-            print(string.format("^3[Haus-Manager Markers Debug]^7 Cached property: %s, owned: %s, owner: %s", 
-                prop.property_name, tostring(prop.owned), tostring(prop.owner_identifier)))
+            print(string.format("^3[Haus-Manager Markers Debug]^7 Property: %s (ID: %s), visible: %s, owned: %s", 
+                prop.property_name, prop.property_id, tostring(prop.marker_visible), tostring(prop.owned)))
         end
     end
 end)
@@ -230,8 +239,8 @@ function AddPropertyTargetZone(property, coords, zoneName)
     })
 end
 
--- Thread 3: Visual marker renderer (draws markers AND 3D text labels)
--- Target zones handle all interactions now
+-- Thread 3: Visual marker renderer (draws markers AND property name labels)
+-- Property names are ALWAYS visible for navigation
 CreateThread(function()
     while true do
         Wait(0)
@@ -256,8 +265,8 @@ CreateThread(function()
             sleep = false
             DrawMarkerWithRadius(data.coords, Config.Markers, data.markerRadius)
             
-            -- Draw 3D text label with icon when close enough
-            if distance < 10.0 then
+            -- Draw property name label when close enough (ALWAYS visible for ESX!)
+            if distance < 15.0 then
                 local text = "🏠 " .. data.property.property_name
                 if data.property.owned == 1 then
                     text = "🏠 " .. data.property.property_name .. " (Besetzt)"
@@ -301,16 +310,7 @@ end
 
 -- Show property menu for owners
 function ShowPropertyMenu(property)
-    -- CRITICAL FIX: Disable ox_target before opening ESX menu to prevent input blocking
-    if Target and Target.Type == 'ox_target' then
-        print("^3[Haus-Manager]^7 Disabling ox_target before opening menu")
-        local success, err = pcall(function()
-            exports.ox_target:disableTargeting(true)
-        end)
-        if not success then
-            print("^1[Haus-Manager ERROR]^7 Failed to disable ox_target: " .. tostring(err))
-        end
-    end
+    print("^2[Haus-Manager]^7 ShowPropertyMenu called for: " .. property.property_name)
     
     local menu = {
         {
@@ -379,21 +379,14 @@ function ShowPropertyMenu(property)
         }
     })
     
+    print("^2[Haus-Manager]^7 Opening menu with " .. #menu .. " options")
     Menu.Open(menu)
+    print("^2[Haus-Manager]^7 Menu.Open() called successfully")
 end
 
 -- Show visitor menu (doorbell)
 function ShowVisitorMenu(property)
-    -- CRITICAL FIX: Disable ox_target before opening ESX menu to prevent input blocking
-    if Target and Target.Type == 'ox_target' then
-        print("^3[Haus-Manager]^7 Disabling ox_target before opening menu")
-        local success, err = pcall(function()
-            exports.ox_target:disableTargeting(true)
-        end)
-        if not success then
-            print("^1[Haus-Manager ERROR]^7 Failed to disable ox_target: " .. tostring(err))
-        end
-    end
+    print("^2[Haus-Manager]^7 ShowVisitorMenu called for: " .. property.property_name)
     
     local menu = {
         {
@@ -420,7 +413,9 @@ function ShowVisitorMenu(property)
         }
     }
     
+    print("^2[Haus-Manager]^7 Opening visitor menu with " .. #menu .. " options")
     Menu.Open(menu)
+    print("^2[Haus-Manager]^7 Menu.Open() called successfully")
 end
 
 
@@ -452,33 +447,11 @@ end)
 
 -- Close menu event
 RegisterNetEvent('haus-manager:client:closeMenu', function()
-    -- Menu systems handle this internally
     print("^3[Haus-Manager Events]^7 Close menu event triggered")
+    Menu.Close()
 end)
 
--- Open sell menu event
-RegisterNetEvent('haus-manager:client:openSellMenu', function(data)
-    print("^2[Haus-Manager Events]^7 openSellMenu event triggered")
-    
-    local property = nil
-    if type(data) == "table" then
-        if data.property then
-            property = data.property
-        elseif data.property_id then
-            property = data
-        end
-    end
-    
-    if property and property.property_id then
-        SetNuiFocus(true, true)
-        SendNUIMessage({
-            action = "openSellUI",
-            property = property
-        })
-    else
-        print("^1[Haus-Manager Events ERROR]^7 Invalid property data for sell menu!")
-    end
-end)
+-- Hinweis: openSellMenu Event-Handler ist in client/sell.lua (nicht hier duplizieren!)
 
 -- Draw 3D text
 function DrawText3D(x, y, z, text)

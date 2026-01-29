@@ -1,182 +1,9 @@
--- Interior system using QB-Interior natives
--- Uses Framework Bridge (loaded before this file)
-local currentInterior = nil
-local insideProperty = false
+-- Interior Marker System für Safe und Garderobe
+-- HINWEIS: Enter/Exit Property wird von main.lua gehandhabt!
+-- Diese Datei nur noch für Safe/Wardrobe Marker und Exit Command
 
--- Enter interior (using qb-interior)
-function EnterInterior(property)
-    local interiorType = property.interior_type
-    local interiorConfig = Config.Interiors[interiorType]
-    
-    if not interiorConfig then
-        QBCore.Functions.Notify("Ungültiger Innenraum!", 'error')
-        return
-    end
-    
-    -- Store current exterior position
-    local exteriorCoords = GetEntityCoords(PlayerPedId())
-    
-    -- Use QB-Interior to load the shell
-    -- This is a placeholder - actual implementation depends on qb-interior structure
-    -- Typically you would call something like:
-    -- exports['qb-interior']:CreateApartmentShell(interiorConfig.shell, function(interiorId)
-    --     -- Teleport player to interior spawn point
-    -- end)
-    
-    -- For now, we'll implement a basic version
-    DoScreenFadeOut(500)
-    Wait(500)
-    
-    -- Set interior ID for this property
-    currentInterior = {
-        propertyId = property.property_id,
-        exteriorCoords = exteriorCoords,
-        interiorType = interiorType
-    }
-    
-    -- Parse property coordinates
-    local coords = json.decode(property.coords)
-    
-    -- Use QB-Interior approach: Teleport to a unique interior dimension based on property ID
-    -- Each interior type has specific coordinates where the shell is loaded
-    -- We offset the coordinates to create unique instances
-    local propertyOffset = property.property_id and tonumber(string.match(property.property_id, "%d+")) or 0
-    
-    -- Interior spawn coordinates (proper interior positions based on type)
-    -- Using researched coordinates that spawn player inside with proper door access
-    local interiorSpawn
-    if interiorConfig.type == "apartment" then
-        -- Apartment interior with proper spawn point near door
-        interiorSpawn = vector4(-782.4077 + (propertyOffset * 0.01), 318.4500, 217.6737, 355.4485)
-    elseif interiorConfig.type == "house" then
-        -- House interior spawn point
-        interiorSpawn = vector4(-174.35 + (propertyOffset * 0.01), 497.5, 137.65, 180.0)
-    elseif interiorConfig.type == "office" then
-        -- Office interior spawn point
-        interiorSpawn = vector4(-141.0 + (propertyOffset * 0.01), -620.0, 168.82, 90.0)
-    else
-        -- Default to apartment coordinates
-        interiorSpawn = vector4(-782.4077, 318.4500, 217.6737, 355.4485)
-    end
-    
-    SetEntityCoords(PlayerPedId(), interiorSpawn.x, interiorSpawn.y, interiorSpawn.z, false, false, false, true)
-    SetEntityHeading(PlayerPedId(), interiorSpawn.w)
-    
-    -- Create interior objects/furniture (simplified)
-    CreateInteriorFurniture(property.property_id, interiorConfig)
-    
-    Wait(500)
-    DoScreenFadeIn(500)
-    
-    insideProperty = true
-    
-    QBCore.Functions.Notify(Config.Notifications["entered_property"], 'success')
-    
-    -- Create exit marker
-    CreateInteriorExitMarker(interiorSpawn)
-    
-    -- Trigger safe and wardrobe marker creation
-    TriggerEvent('haus-manager:client:setupInteriorMarkers', property)
-end
-
--- Exit interior
-function ExitInterior()
-    if not currentInterior then
-        QBCore.Functions.Notify("Sie sind nicht in einer Immobilie!", 'error')
-        return
-    end
-    
-    -- Clean up safe and wardrobe markers
-    TriggerEvent('haus-manager:client:cleanupInteriorMarkers', currentInterior.propertyId)
-    
-    DoScreenFadeOut(500)
-    Wait(500)
-    
-    -- Teleport back to exterior
-    SetEntityCoords(PlayerPedId(), 
-        currentInterior.exteriorCoords.x,
-        currentInterior.exteriorCoords.y,
-        currentInterior.exteriorCoords.z
-    )
-    
-    -- Clean up interior
-    DeleteInteriorFurniture()
-    
-    currentInterior = nil
-    insideProperty = false
-    
-    Wait(500)
-    DoScreenFadeIn(500)
-    
-    QBCore.Functions.Notify(Config.Notifications["exited_property"], 'success')
-end
-
--- Create interior furniture (simplified version)
 local interiorObjects = {}
-
-function CreateInteriorFurniture(propertyId, interiorConfig)
-    -- This is a simplified version
-    -- In a full implementation, you would load specific props based on the shell type
-    -- For now, we'll just create a basic setup
-    
-    local playerCoords = GetEntityCoords(PlayerPedId())
-    
-    -- Example: Create some basic furniture
-    -- In reality, qb-interior would handle this with proper shell models
-    
-    if Config.Debug then
-        print(string.format("^3[Haus-Manager]^7 Loading interior: %s", interiorConfig.label))
-    end
-end
-
--- Delete interior furniture
-function DeleteInteriorFurniture()
-    for _, obj in ipairs(interiorObjects) do
-        if DoesEntityExist(obj) then
-            DeleteObject(obj)
-        end
-    end
-    interiorObjects = {}
-end
-
--- Create exit marker inside property
-function CreateInteriorExitMarker(spawnCoords)
-    CreateThread(function()
-        -- Place exit marker at door/spawn location (where player entered)
-        -- This ensures players can always find the exit
-        local exitCoords = vector3(spawnCoords.x, spawnCoords.y, spawnCoords.z)
-        
-        while insideProperty do
-            Wait(0)
-            
-            local playerCoords = GetEntityCoords(PlayerPedId())
-            local distance = #(playerCoords - exitCoords)
-            
-            if distance <= 50.0 then
-                -- Draw exit marker (red for visibility) - ON THE GROUND
-                DrawMarker(
-                    1, -- Cylinder
-                    exitCoords.x, exitCoords.y, exitCoords.z - 0.95, -- Just slightly below spawn point to be ON ground
-                    0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0,
-                    1.2, 1.2, 0.8,
-                    255, 0, 0, 180,
-                    false, false, 2, false, nil, nil, false
-                )
-                
-                if distance <= 3.0 then
-                    DrawText3D(exitCoords.x, exitCoords.y, exitCoords.z + 0.5, "[E] Immobilie verlassen")
-                    
-                    if IsControlJustReleased(0, 38) then -- E key
-                        ExitInterior()
-                    end
-                end
-            else
-                Wait(500)
-            end
-        end
-    end)
-end
+local activeInteriorMarkers = {}
 
 -- Draw 3D text helper
 function DrawText3D(x, y, z, text)
@@ -194,66 +21,126 @@ function DrawText3D(x, y, z, text)
     ClearDrawOrigin()
 end
 
--- Override EnterProperty from main.lua
-function EnterProperty(property)
-    EnterInterior(property)
-end
-
--- Override ExitProperty from main.lua
-function ExitProperty()
-    ExitInterior()
-end
-
--- Exit property event (triggered when property is sold)
-RegisterNetEvent('haus-manager:client:exitProperty', function()
-    if insideProperty or currentInterior then
-        ExitInterior()
+-- Event: Setup interior markers (Safe, Wardrobe) - called by main.lua
+RegisterNetEvent('haus-manager:client:setupInteriorMarkers', function(property)
+    if not property then return end
+    
+    local propertyId = property.property_id
+    print("^2[Haus-Manager Interior]^7 Setting up markers for: " .. propertyId)
+    
+    -- Clean up existing markers first
+    if activeInteriorMarkers[propertyId] then
+        print("^3[Haus-Manager Interior]^7 Cleaning up existing markers")
+        for _, thread in pairs(activeInteriorMarkers[propertyId]) do
+            if thread then
+                -- Threads will stop naturally when markers are replaced
+            end
+        end
+    end
+    
+    activeInteriorMarkers[propertyId] = {}
+    
+    -- Create Safe Marker
+    if property.safe_coords then
+        local safeCoords = json.decode(property.safe_coords)
+        print("^2[Haus-Manager Interior]^7 Creating safe marker at: " .. safeCoords.x .. ", " .. safeCoords.y .. ", " .. safeCoords.z)
+        
+        local safeThread = CreateThread(function()
+            local safeProp = CreateObject(GetHashKey("p_v_43_safe_s"), safeCoords.x, safeCoords.y, safeCoords.z, false, false, false)
+            SetEntityHeading(safeProp, safeCoords.heading or 0.0)
+            FreezeEntityPosition(safeProp, true)
+            table.insert(interiorObjects, safeProp)
+            
+            while isInProperty do
+                Wait(0)
+                local playerCoords = GetEntityCoords(PlayerPedId())
+                local distance = #(playerCoords - vector3(safeCoords.x, safeCoords.y, safeCoords.z))
+                
+                if distance < 2.0 then
+                    DrawText3D(safeCoords.x, safeCoords.y, safeCoords.z + 0.5, "[~g~E~w~] Tresor öffnen")
+                    if IsControlJustReleased(0, 38) then
+                        TriggerEvent('haus-manager:client:openStash', property)
+                    end
+                end
+            end
+        end)
+        
+        activeInteriorMarkers[propertyId].safe = safeThread
+    end
+    
+    -- Create Wardrobe Marker
+    if property.wardrobe_coords then
+        local wardrobeCoords = json.decode(property.wardrobe_coords)
+        print("^2[Haus-Manager Interior]^7 Creating wardrobe marker at: " .. wardrobeCoords.x .. ", " .. wardrobeCoords.y .. ", " .. wardrobeCoords.z)
+        
+        local wardrobeThread = CreateThread(function()
+            while isInProperty do
+                Wait(0)
+                local playerCoords = GetEntityCoords(PlayerPedId())
+                local distance = #(playerCoords - vector3(wardrobeCoords.x, wardrobeCoords.y, wardrobeCoords.z))
+                
+                if distance <= 50.0 then
+                    DrawMarker(
+                        1, -- Cylinder
+                        wardrobeCoords.x, wardrobeCoords.y, wardrobeCoords.z - 0.95,
+                        0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0,
+                        0.5, 0.5, 0.3,
+                        0, 255, 255, 120, -- Cyan for wardrobe
+                        false, true, 2, false, nil, nil, false
+                    )
+                    
+                    if distance < 2.0 then
+                        DrawText3D(wardrobeCoords.x, wardrobeCoords.y, wardrobeCoords.z + 0.5, "[~g~E~w~] Garderobe öffnen")
+                        if IsControlJustReleased(0, 38) then
+                            TriggerEvent('haus-manager:client:openWardrobe', property)
+                        end
+                    end
+                end
+            end
+        end)
+        
+        activeInteriorMarkers[propertyId].wardrobe = wardrobeThread
     end
 end)
 
--- Emergency exit command - ALWAYS WORKS regardless of property state
--- This is a safety measure to get players unstuck from ANY location
+-- Event: Cleanup interior markers - called by main.lua before exit
+RegisterNetEvent('haus-manager:client:cleanupInteriorMarkers', function(propertyId)
+    if activeInteriorMarkers[propertyId] then
+        print("^2[Haus-Manager Interior]^7 Cleaning up markers for: " .. propertyId)
+        activeInteriorMarkers[propertyId] = nil
+    end
+    
+    -- Delete spawned objects (safe prop)
+    for _, obj in ipairs(interiorObjects) do
+        if DoesEntityExist(obj) then
+            DeleteObject(obj)
+        end
+    end
+    interiorObjects = {}
+end)
+
+-- Emergency exit command - IMMER verfügbar!
 RegisterCommand('exit', function()
-    DoScreenFadeOut(500)
-    Wait(500)
+    print("^2[Haus-Manager Exit Command]^7 Emergency exit triggered")
     
-    -- Try to use stored exterior coords if available, otherwise use Pillbox
-    local exitCoords
-    if currentInterior and currentInterior.exteriorCoords then
-        exitCoords = currentInterior.exteriorCoords
+    -- Call ExitProperty from main.lua if player is inside
+    if isInProperty and currentProperty then
+        TriggerEvent('haus-manager:client:exitProperty')
     else
-        -- Fallback to Pillbox Hospital (universal safe spawn)
-        exitCoords = vector4(304.27, -600.33, 43.28, 272.249)
-    end
-    
-    -- Teleport player to exit location
-    SetEntityCoords(PlayerPedId(), exitCoords.x, exitCoords.y, exitCoords.z, false, false, false, true)
-    if exitCoords.w then
+        -- Fallback: Teleport to Pillbox Hospital
+        DoScreenFadeOut(500)
+        Wait(500)
+        
+        local exitCoords = vector4(304.27, -600.33, 43.28, 272.249)
+        SetEntityCoords(PlayerPedId(), exitCoords.x, exitCoords.y, exitCoords.z, false, false, false, true)
         SetEntityHeading(PlayerPedId(), exitCoords.w)
+        
+        Wait(500)
+        DoScreenFadeIn(500)
+        
+        Framework.Notify("Notausgang benutzt - Sie wurden teleportiert!", 'success')
     end
-    
-    -- Clean up any interior state
-    DeleteInteriorFurniture()
-    currentInterior = nil
-    insideProperty = false
-    
-    Wait(500)
-    DoScreenFadeIn(500)
-    
-    QBCore.Functions.Notify("Notausgang benutzt - Sie wurden teleportiert!", 'success')
 end, false)
 
--- Player loaded event - just initialize interior state (NO AUTO-SPAWN)
-RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    -- Just ensure interior state is clean on login
-    -- DO NOT auto-spawn - let QBCore/multicharacter handle spawn
-    if Config.Debug then
-        print("^2[Haus-Manager]^7 Player loaded - interior system initialized")
-    end
-end)
-
--- Export functions
-exports('EnterInterior', EnterInterior)
-exports('ExitInterior', ExitInterior)
-exports('IsInsideProperty', function() return insideProperty end)
-exports('GetCurrentInterior', function() return currentInterior end)
+print("^2[Haus-Manager]^7 Interior marker system loaded (Safe/Wardrobe only)")

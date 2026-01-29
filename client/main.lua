@@ -345,6 +345,13 @@ function EnterProperty(property)
     
     print("^2[Haus-Manager EnterProperty]^7 Interior config found, type: " .. tostring(interiorType))
     
+    -- CRITICAL: Store PROPERTY MARKER position for exit (NOT player position!)
+    -- This ensures player exits at the SAME location as the property marker
+    local propertyCoords = json.decode(property.coords)
+    local exteriorCoords = vector3(propertyCoords.x, propertyCoords.y, propertyCoords.z)
+    local exteriorHeading = propertyCoords.heading or 0.0
+    print("^2[Haus-Manager EnterProperty]^7 Storing MARKER coords for exit: " .. exteriorCoords.x .. ", " .. exteriorCoords.y .. ", " .. exteriorCoords.z)
+    
     -- Screen fade for smooth transition
     DoScreenFadeOut(500)
     
@@ -382,32 +389,113 @@ function EnterProperty(property)
     Wait(500)
     DoScreenFadeIn(500)
     
-    -- Use QB-Interior if available (optional enhancement for QB-Core)
+    -- Try to use qb-interior if available (optional, mainly for QB-Core)
+    -- For ESX, we use alternative shells without built-in exit markers
     if GetResourceState('qb-interior') == 'started' then
-        print("^2[Haus-Manager EnterProperty]^7 Using qb-interior enhancement")
+        print("^3[Haus-Manager EnterProperty]^7 qb-interior found, loading shell via qb-interior")
         TriggerEvent('qb-interior:client:enter', interiorConfig.shell, property.property_id)
     else
         print("^3[Haus-Manager EnterProperty]^7 qb-interior not available (ESX mode or not installed)")
+        -- ESX uses alternative shells (ClassicHouse, RanchHouse, ModernHouse2) without built-in markers
     end
     
     isInProperty = true
     currentProperty = property
+    -- CRITICAL: Store exterior coords and heading for exit
+    currentProperty.storedExteriorCoords = vector4(exteriorCoords.x, exteriorCoords.y, exteriorCoords.z, exteriorHeading)
     
-    Framework.Notify(Config.Notifications["entered_property"] or "Property betreten", 'success')
-    print("^2[Haus-Manager EnterProperty]^7 Property entered successfully - player is now inside")
+    -- CRITICAL FIX: Trigger safe and wardrobe marker creation
+    print("^2[Haus-Manager EnterProperty]^7 Richte Innenraum-Marker ein (Safe, Garderobe)")
+    TriggerEvent('haus-manager:client:setupInteriorMarkers', property)
+    
+    -- CRITICAL FIX: Create exit marker at spawn location
+    print("^2[Haus-Manager EnterProperty]^7 Erstelle Ausgangs-Marker im Interior")
+    CreateInteriorExitMarker(interiorConfig.spawn)
+    
+    Framework.Notify(Config.Notifications["entered_property"] or "Immobilie betreten", 'success')
+    print("^2[Haus-Manager EnterProperty]^7 Immobilie erfolgreich betreten - Spieler ist jetzt drinnen")
+end
+
+-- Create exit marker inside property
+function CreateInteriorExitMarker(spawnCoords)
+    CreateThread(function()
+        -- Platziere Exit-Marker an der Tür/Spawn-Position (wo Spieler reinkam)
+        -- Dies stellt sicher dass Spieler den Ausgang immer finden
+        local exitCoords = vector3(spawnCoords.x, spawnCoords.y, spawnCoords.z)
+        
+        while isInProperty do
+            Wait(0)
+            
+            local playerCoords = GetEntityCoords(PlayerPedId())
+            local distance = #(playerCoords - exitCoords)
+            
+            if distance <= 50.0 then
+                -- Zeichne Exit-Marker (FEUERROT für Ausgang) - AUF DEM BODEN
+                DrawMarker(
+                    1, -- Zylinder
+                    exitCoords.x, exitCoords.y, exitCoords.z - 0.95, -- Leicht unter Spawn-Point um AUF dem Boden zu sein
+                    0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0,
+                    0.5, 0.5, 0.3, -- KLEINER Marker
+                    255, 0, 0, 200, -- FEUERROT und gut sichtbar!
+                    false, false, 2, false, nil, nil, false
+                )
+                
+                if distance <= 3.0 then
+                    DrawText3D(exitCoords.x, exitCoords.y, exitCoords.z + 0.5, "[~g~E~w~] Immobilie verlassen")
+                    
+                    if IsControlJustReleased(0, 38) then -- E Taste
+                        ExitProperty() -- Rufe ExitProperty() statt ExitInterior()
+                    end
+                end
+            else
+                Wait(500)
+            end
+        end
+    end)
 end
 
 -- Exit property
 function ExitProperty()
     if not isInProperty or not currentProperty then return end
     
-    -- Use QB-Interior to exit
-    TriggerEvent('qb-interior:client:exit')
+    print("^2[Haus-Manager ExitProperty]^7 Verlasse Immobilie: " .. tostring(currentProperty.property_name))
+    
+    -- CRITICAL: Clean up safe and wardrobe markers BEFORE exit
+    print("^2[Haus-Manager ExitProperty]^7 Räume Innenraum-Marker auf")
+    TriggerEvent('haus-manager:client:cleanupInteriorMarkers', currentProperty.property_id)
+    
+    DoScreenFadeOut(500)
+    Wait(500)
+    
+    -- Teleport back to stored exterior coordinates
+    local ped = PlayerPedId()
+    if currentProperty.storedExteriorCoords then
+        local coords = currentProperty.storedExteriorCoords
+        print("^2[Haus-Manager ExitProperty]^7 Teleportiere zu gespeichertem Ausgang: " .. coords.x .. ", " .. coords.y .. ", " .. coords.z)
+        SetEntityCoords(ped, coords.x, coords.y, coords.z, false, false, false, true)
+        SetEntityHeading(ped, coords.w or 0.0)
+    else
+        -- Fallback: Use property marker coordinates
+        print("^3[Haus-Manager ExitProperty]^7 Keine gespeicherten Koordinaten, verwende Marker-Position")
+        local propertyCoords = json.decode(currentProperty.coords)
+        SetEntityCoords(ped, propertyCoords.x, propertyCoords.y, propertyCoords.z, false, false, false, true)
+        SetEntityHeading(ped, propertyCoords.heading or 0.0)
+    end
+    
+    -- Use QB-Interior exit if available
+    if GetResourceState('qb-interior') == 'started' then
+        TriggerEvent('qb-interior:client:exit')
+    end
+    
+    Wait(500)
+    DoScreenFadeIn(500)
     
     isInProperty = false
     currentProperty = nil
     
-    Framework.Notify(Config.Notifications["exited_property"], 'success')
+    Framework.Notify(Config.Notifications["exited_property"] or "Immobilie verlassen", 'success')
+    print("^2[Haus-Manager ExitProperty]^7 Ausgang erfolgreich abgeschlossen")
 end
 
 -- Check if player owns or has key to property
