@@ -389,12 +389,16 @@ function EnterProperty(property)
     Wait(500)
     DoScreenFadeIn(500)
     
-    -- Use QB-Interior if available (optional enhancement for QB-Core)
+    -- CRITICAL: Use qb-interior for BOTH QB-Core AND ESX
+    -- qb-interior removes built-in shell exit markers automatically
+    -- Without qb-interior, shells may show green exit markers with English text
     if GetResourceState('qb-interior') == 'started' then
-        print("^2[Haus-Manager EnterProperty]^7 Using qb-interior enhancement")
+        print("^2[Haus-Manager EnterProperty]^7 Using qb-interior to load shell (removes built-in exit markers)")
         TriggerEvent('qb-interior:client:enter', interiorConfig.shell, property.property_id)
     else
-        print("^3[Haus-Manager EnterProperty]^7 qb-interior not available (ESX mode or not installed)")
+        print("^1[Haus-Manager EnterProperty]^7 WARNING: qb-interior not found!")
+        print("^1[Haus-Manager EnterProperty]^7 Shells may show green exit markers with English text")
+        print("^1[Haus-Manager EnterProperty]^7 Install qb-interior for ESX: https://github.com/qbcore-framework/qb-interior")
     end
     
     -- Note: Some interior shells may have built-in markers
